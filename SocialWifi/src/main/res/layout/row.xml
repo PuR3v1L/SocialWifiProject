@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.spydiko.socialwifi.NoParentPressTextView
+        android:id="@+id/list_value"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:clickable="true"
+        android:padding="10dp"
+        android:background="@drawable/mybutton"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <View
+        android:layout_height="fill_parent"
+        android:layout_marginTop="2dp"
+        android:focusable="true"
+        android:layout_marginBottom="2dp"
+        android:layout_width="2px"
+        android:background="#90909090" />
+
+    <com.spydiko.socialwifi.NoParentPressImageView
+        android:id="@+id/right"
+        android:layout_width="?android:attr/listPreferredItemHeight"
+        android:layout_height="fill_parent"
+        android:padding="10dp"
+        android:src="@android:drawable/ic_menu_upload"
+        android:clickable="true"
+        android:background="@drawable/mybutton" />
+
+</LinearLayout>

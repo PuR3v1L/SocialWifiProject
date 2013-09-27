@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Social Wifi</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="buttonUpdate">Scan Networks</string>
+    <string name="createdby">Created by SpyDiKo\n2013 \u00a9 S.D.K.</string>
+
+</resources>
