@@ -22,7 +22,7 @@ public class NoParentPressTextView extends TextView {
 
     @Override
     public boolean onTouchEvent (MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN) setPressed(true);
+//        if (event.getAction() == MotionEvent.ACTION_DOWN) setPressed(true);
         return super.onTouchEvent(event);
     }
 }

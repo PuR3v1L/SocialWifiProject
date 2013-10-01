@@ -11,9 +11,8 @@
         android:layout_height="fill_parent"
         android:layout_weight="1"
         android:gravity="center_vertical"
-        android:clickable="true"
+        android:textSize="18sp"
         android:padding="10dp"
-        android:background="@drawable/mybutton"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <View
@@ -26,7 +25,7 @@
 
     <com.spydiko.socialwifi.NoParentPressImageView
         android:id="@+id/right"
-        android:layout_width="?android:attr/listPreferredItemHeight"
+        android:layout_width="60dp"
         android:layout_height="fill_parent"
         android:padding="10dp"
         android:src="@android:drawable/ic_menu_upload"
