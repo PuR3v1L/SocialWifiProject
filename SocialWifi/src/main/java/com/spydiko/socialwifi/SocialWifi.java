@@ -18,6 +18,7 @@ import org.xmlpull.v1.XmlSerializer;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -37,14 +38,21 @@ public class SocialWifi extends Application {
     private static final long MINIMUM_TIME_BETWEEN_UPDATES = 1000; // in Milliseconds
     private WifiManager wifi;
     private ConnectivityManager connectivityManager;
+    private FileOutputStream outputStream;
+    private OutputStreamWriter osw;
+    private ArrayList<WifiPass> wifies;
+    private double[] location_now;
 
     public void onCreate() {
         super.onCreate();
+        wifies = new ArrayList<WifiPass>();
         wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
-
+    public double[] getLocationCoord(){
+        return location_now;
+    }
     public WifiManager getWifi() {
         return wifi;
     }
@@ -53,7 +61,7 @@ public class SocialWifi extends Application {
         return connectivityManager;
     }
 
-    public static void CreateXMLString(OutputStreamWriter out, ArrayList<WifiPass> wifies) throws IllegalArgumentException, IllegalStateException, IOException {
+    public static void createXMLString(OutputStreamWriter out, ArrayList<WifiPass> wifies) throws IllegalArgumentException, IllegalStateException, IOException {
         XmlSerializer xmlSerializer = Xml.newSerializer();
         xmlSerializer.setOutput(out);
 
@@ -92,7 +100,7 @@ public class SocialWifi extends Application {
         xmlSerializer.endDocument();
     }
 
-    public ArrayList<WifiPass> ReadFromXML(String xmlFile) {
+    public ArrayList<WifiPass> readFromXML(String xmlFile) {
 
         ArrayList<WifiPass> userData = new ArrayList<WifiPass>();
         FileInputStream fis;
@@ -252,9 +260,10 @@ public class SocialWifi extends Application {
     }
 
     public void getLocation() {
-        lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
         gotLocation = false;
+        Log.d(TAG,"getLocation");
     /*
      * Loop over the array backwards, and if you get an accurate location,
      * then break out the loop
@@ -276,13 +285,24 @@ public class SocialWifi extends Application {
         this.gotLocation = gotLocation;
     }
 
+    public ArrayList<WifiPass> getWifies() {
+        return wifies;
+    }
+
+    public void setWifies(ArrayList<WifiPass> wifies) {
+        this.wifies = wifies;
+    }
+
     private class MyLocationListener implements LocationListener {
 
         public void onLocationChanged(Location location) {
+            location_now = new double[2];
             String message = String.format(
                     "New Location Longitude: %1$s Latitude: %2$s Time: %3$s",
                     location.getLongitude(), location.getLatitude(), location.getTime()-System.currentTimeMillis()
             );
+            location_now[0]=location.getLatitude();
+            location_now[1]=location.getLongitude();
             Log.d(TAG,message);
             gotLocation = true;
             lm.removeUpdates(this);
@@ -344,6 +364,14 @@ public class SocialWifi extends Application {
         return 1;
     }
 
-
+    public void storeXML (byte[] buffer) {
+        try {
+            outputStream = openFileOutput("server.xml", Context.MODE_PRIVATE);
+            outputStream.write(buffer);
+            outputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }

@@ -6,5 +6,9 @@
     <string name="hello_world">Hello world!</string>
     <string name="buttonUpdate">Scan Networks</string>
     <string name="createdby">Created by SpyDiKo\n2013 \u00a9 S.D.K.</string>
+    <string name="updateFromServer">Update From Server</string>
+    <string name="uploadPassword">Upload</string>
+    <string name="cancelUploadPassword">Cancel</string>
+    <string name="password">Enter password...</string>
 
 </resources>
