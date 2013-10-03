@@ -194,6 +194,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 UploadToServer uploadToServer = new UploadToServer(this, socialWifi);
                 uploadToServer.execute();
                 break;
+	        case R.id.preferences:
+		        startActivity(new Intent(this, PrefsActivity.class));
+		        break;
             case R.id.list_value:
                 break;
         }

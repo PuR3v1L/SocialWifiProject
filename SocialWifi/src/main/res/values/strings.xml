@@ -10,5 +10,11 @@
     <string name="uploadPassword">Upload</string>
     <string name="cancelUploadPassword">Cancel</string>
     <string name="password">Enter password...</string>
+    <string name="preferences">Preferences</string>
+    <string name="localization_prefs">Localization Preferences</string>
+    <string name="radius_pref_title">Area of interest</string>
+    <string name="titlePrefs">Preferences</string>
+    <string name="area_radius_sum">Set the area you want to download. Now set to:</string>
+
 
 </resources>

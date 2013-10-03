@@ -2,6 +2,7 @@ package com.spydiko.socialwifi;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -9,6 +10,7 @@ import android.net.ConnectivityManager;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.Xml;
 
@@ -30,31 +32,37 @@ import java.util.List;
 /**
  * Created by jim on 5/9/2013.
  */
-public class SocialWifi extends Application {
+public class SocialWifi extends Application implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private final static String TAG = SocialWifi.class.getSimpleName();
     private boolean gotLocation;
     private LocationManager lm;
     private static final long MINIMUM_DISTANCE_CHANGE_FOR_UPDATES = 1; // in Meters
     private static final long MINIMUM_TIME_BETWEEN_UPDATES = 1000; // in Milliseconds
-    private WifiManager wifi;
+	private SharedPreferences prefs;
+	private SharedPreferences.Editor editor;
+	private WifiManager wifi;
     private ConnectivityManager connectivityManager;
     private FileOutputStream outputStream;
     private OutputStreamWriter osw;
     private ArrayList<WifiPass> wifies;
     private double[] location_now;
+	private float areaRadius;
 
     public void onCreate() {
         super.onCreate();
         wifies = new ArrayList<WifiPass>();
         wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+	    prefs = PreferenceManager.getDefaultSharedPreferences(this);
+	    prefs.registerOnSharedPreferenceChangeListener(this);
+	    editor = prefs.edit();
+	    loadPreferences();
     }
 
-    public double[] getLocationCoord() {
+    public double[] getLocationCoord(){
         return location_now;
     }
-
     public WifiManager getWifi() {
         return wifi;
     }
@@ -102,6 +110,12 @@ public class SocialWifi extends Application {
         xmlSerializer.endDocument();
     }
 
+	private void loadPreferences() {
+		Log.d(TAG, "loadPreferences");
+		areaRadius = prefs.getFloat("areaRadius", 3);
+
+	}
+	
     public ArrayList<WifiPass> readFromXML(String xmlFile) {
 
         ArrayList<WifiPass> userData = new ArrayList<WifiPass>();
@@ -279,6 +293,17 @@ public class SocialWifi extends Application {
 
     }
 
+	public float getAreaRadius() {
+		return areaRadius;
+	}
+
+	public void setAreaRadius(float areaRadius) {
+		Log.d(TAG, "areaRadius changed to: " + areaRadius);
+		this.areaRadius = areaRadius;
+		editor.putFloat("areaRadius", areaRadius);
+		editor.commit();
+	}
+	
     public boolean isGotLocation() {
         return gotLocation;
     }
@@ -294,7 +319,13 @@ public class SocialWifi extends Application {
     public void setWifies(ArrayList<WifiPass> wifies) {
         this.wifies = wifies;
     }
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+		Log.d(TAG, s + " changed!");
+		if (s.equals("area_radius_list")) setAreaRadius(Float.valueOf(sharedPreferences.getString("area_radius_list", "3")));
 
+	}
+	
     private class MyLocationListener implements LocationListener {
 
         public void onLocationChanged(Location location) {

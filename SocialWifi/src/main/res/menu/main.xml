@@ -4,4 +4,7 @@
         android:title="@string/updateFromServer"
         android:icon="@android:drawable/stat_notify_sync"
         android:showAsAction="ifRoom"/>
+    <item
+            android:id="@+id/preferences"
+            android:title="@string/preferences"/>
 </menu>
