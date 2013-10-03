@@ -233,8 +233,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                                 @Override
                                 public void onClick(DialogInterface dialog, int id) {
                                     EditText password = (EditText) view.findViewById(R.id.dialog_password);
-                                    socialWifi.getLocation();
-                                    UploadToServer uploadToServer = new UploadToServer(clickedWifi.get(ITEM_KEY),clickedWifi.get(BSSID_KEY),password.getText().toString(),context,socialWifi);
+                                    UploadToServer uploadToServer = new UploadToServer(clickedWifi.get(ITEM_KEY),clickedWifi.get(BSSID_KEY),password.getText().toString(),context,socialWifi,clickedWifi.get(EXTRAS_KEY));
                                     uploadToServer.execute();
                                     dialog.dismiss();
                                 }

@@ -6,6 +6,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
+import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -50,9 +51,10 @@ public class SocialWifi extends Application {
         connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
-    public double[] getLocationCoord(){
+    public double[] getLocationCoord() {
         return location_now;
     }
+
     public WifiManager getWifi() {
         return wifi;
     }
@@ -263,7 +265,7 @@ public class SocialWifi extends Application {
         lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
         gotLocation = false;
-        Log.d(TAG,"getLocation");
+        Log.d(TAG, "getLocation");
     /*
      * Loop over the array backwards, and if you get an accurate location,
      * then break out the loop
@@ -299,11 +301,11 @@ public class SocialWifi extends Application {
             location_now = new double[2];
             String message = String.format(
                     "New Location Longitude: %1$s Latitude: %2$s Time: %3$s",
-                    location.getLongitude(), location.getLatitude(), location.getTime()-System.currentTimeMillis()
+                    location.getLongitude(), location.getLatitude(), location.getTime() - System.currentTimeMillis()
             );
-            location_now[0]=location.getLatitude();
-            location_now[1]=location.getLongitude();
-            Log.d(TAG,message);
+            location_now[0] = location.getLatitude();
+            location_now[1] = location.getLongitude();
+            Log.d(TAG, message);
             gotLocation = true;
             lm.removeUpdates(this);
         }
@@ -364,7 +366,7 @@ public class SocialWifi extends Application {
         return 1;
     }
 
-    public void storeXML (byte[] buffer) {
+    public void storeXML(byte[] buffer) {
         try {
             outputStream = openFileOutput("server.xml", Context.MODE_PRIVATE);
             outputStream.write(buffer);
@@ -374,4 +376,53 @@ public class SocialWifi extends Application {
         }
     }
 
+    public void removeNetwork(String ssid, String bssid) {
+        List<WifiConfiguration> list = wifi.getConfiguredNetworks();
+        for (WifiConfiguration i : list) {
+            Log.d(TAG, i.SSID + " " + i.BSSID);
+            if (i.SSID != null && i.SSID.equals("\"" + ssid + "\"")) {
+                wifi.removeNetwork(i.networkId);
+                wifi.setWifiEnabled(false);
+                wifi.setWifiEnabled(true);
+            }
+        }
+    }
+
+    public void connect(String networkSSID, String networkPass, int typeOfEncryption) {
+        WifiConfiguration conf = new WifiConfiguration();
+        conf.SSID = "\"" + networkSSID + "\"";   // Please note the quotes. String should contain ssid in quotes
+        // Case of WPA
+        switch (typeOfEncryption) {
+            case 2:
+                Log.d(TAG, "WPA");
+                conf.preSharedKey = "\"" + networkPass + "\"";
+                break;
+            default:
+                break;
+        }
+        conf.status = WifiConfiguration.Status.ENABLED;
+        conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
+        conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
+        conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+        conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
+        conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
+        conf.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+        int inet = wifi.addNetwork(conf);
+        Log.d(TAG, "Added " + inet);
+        if (inet > 0) {
+            List<WifiConfiguration> list = wifi.getConfiguredNetworks();
+            for (WifiConfiguration i : list) {
+                if (i.SSID != null && i.SSID.equals("\"" + networkSSID + "\"")) {
+                    Log.d(TAG, "Done!");
+                    wifi.disconnect();
+                    boolean b = wifi.enableNetwork(inet, true);
+                    Log.d(TAG, "Result " + b);
+                    boolean c = wifi.reconnect();
+                    Log.d(TAG, "Result " + c);
+                    break;
+                }
+            }
+        }
+
+    }
 }
