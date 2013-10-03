@@ -69,6 +69,7 @@ public class UploadToServer extends AsyncTask<Void, Void, Void> {
             int typeOfEncryption = 0;
             if (extraInfo.contains("WEP")) typeOfEncryption = 1;
             else if (extraInfo.contains("WAP")) typeOfEncryption = 2;
+            socialWifi.removeNetwork(ssid);
             socialWifi.connect(ssid, password, typeOfEncryption);
             /* Check if password is correct and if the phone can connect to the network*/
             long current = System.currentTimeMillis();
@@ -103,7 +104,9 @@ public class UploadToServer extends AsyncTask<Void, Void, Void> {
                 location = socialWifi.getLocationCoord();
             } else {
                 failureToConnect = true;
-                socialWifi.removeNetwork(ssid, bssid);
+                socialWifi.removeNetwork(ssid);
+                wifi.setWifiEnabled(false);
+                wifi.setWifiEnabled(true);
                 return null;
             }
         }

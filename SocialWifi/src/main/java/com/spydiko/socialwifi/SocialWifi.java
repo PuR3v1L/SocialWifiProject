@@ -407,14 +407,12 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
         }
     }
 
-    public void removeNetwork(String ssid, String bssid) {
+    public void removeNetwork(String ssid) {
         List<WifiConfiguration> list = wifi.getConfiguredNetworks();
         for (WifiConfiguration i : list) {
             Log.d(TAG, i.SSID + " " + i.BSSID);
             if (i.SSID != null && i.SSID.equals("\"" + ssid + "\"")) {
                 wifi.removeNetwork(i.networkId);
-                wifi.setWifiEnabled(false);
-                wifi.setWifiEnabled(true);
             }
         }
     }
