@@ -1,5 +1,6 @@
 package com.spydiko.socialwifi;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
@@ -10,20 +11,15 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.app.Activity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -31,18 +27,13 @@ import android.widget.Toast;
 
 import org.xmlpull.v1.XmlSerializer;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
@@ -236,7 +227,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
                                 @Override
                                 public void onClick(DialogInterface dialog, int id) {
                                     EditText password = (EditText) view.findViewById(R.id.dialog_password);
-                                    UploadToServer uploadToServer = new UploadToServer(clickedWifi.get(ITEM_KEY),clickedWifi.get(BSSID_KEY),password.getText().toString(),context,socialWifi,clickedWifi.get(EXTRAS_KEY));
+	                                socialWifi.getLocation();
+	                                UploadToServer uploadToServer = new UploadToServer(clickedWifi.get(ITEM_KEY),clickedWifi.get(BSSID_KEY),password.getText().toString(),context,socialWifi,clickedWifi.get(EXTRAS_KEY));
                                     uploadToServer.execute();
                                     dialog.dismiss();
                                 }

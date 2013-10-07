@@ -1,20 +1,16 @@
 package com.spydiko.socialwifi;
 
-import android.app.Application;
 import android.app.Dialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.Window;
-import android.webkit.WebBackForwardList;
 import android.widget.Toast;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
@@ -65,34 +61,34 @@ public class UploadToServer extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... params) {
 
-        if (add) {
-            int typeOfEncryption = 0;
-            if (extraInfo.contains("WEP")) typeOfEncryption = 1;
-            else if (extraInfo.contains("WAP")) typeOfEncryption = 2;
-            socialWifi.removeNetwork(ssid);
-            socialWifi.connect(ssid, password, typeOfEncryption);
-            /* Check if password is correct and if the phone can connect to the network*/
-            long current = System.currentTimeMillis();
-            NetworkInfo networkInfo;
-            boolean ok = false;
-            Log.d(TAG, "entered");
-            connectivityManager = socialWifi.getConnectivityManager();
-            wifi = socialWifi.getWifi();
-            while (System.currentTimeMillis() - current < 10000) {
-                networkInfo = connectivityManager.getActiveNetworkInfo();
-                try {
-                    if (networkInfo != null && wifi.getConnectionInfo().getBSSID().equals(bssid)) {
-                        ok = true;
-                        Log.d(TAG, "correct pass");
-                        wifi.saveConfiguration();
-                        break;
-                    }
-                } catch (Exception e) {
+//        if (add) {
+//            int typeOfEncryption = 0;
+//            if (extraInfo.contains("WEP")) typeOfEncryption = 1;
+//            else if (extraInfo.contains("WAP")) typeOfEncryption = 2;
+//            socialWifi.removeNetwork(ssid);
+//            socialWifi.connect(ssid, password, typeOfEncryption);
+//            /* Check if password is correct and if the phone can connect to the network*/
+//            long current = System.currentTimeMillis();
+//            NetworkInfo networkInfo;
+//            boolean ok = false;
+//            Log.d(TAG, "entered");
+//            connectivityManager = socialWifi.getConnectivityManager();
+//            wifi = socialWifi.getWifi();
+//            while (System.currentTimeMillis() - current < 10000) {
+//                networkInfo = connectivityManager.getActiveNetworkInfo();
+//                try {
+//                    if (networkInfo != null && wifi.getConnectionInfo().getBSSID().equals(bssid)) {
+//                        ok = true;
+//                        Log.d(TAG, "correct pass");
+//                        wifi.saveConfiguration();
+//                        break;
+//                    }
+//                } catch (Exception e) {
+//
+//                }
+//            }
+//            if (ok) {
 
-                }
-            }
-            if (ok) {
-                socialWifi.getLocation();
             /* Get current location through wifi*/
                 while (!socialWifi.isGotLocation()) {
                     try {
@@ -102,17 +98,17 @@ public class UploadToServer extends AsyncTask<Void, Void, Void> {
                     }
                 }
                 location = socialWifi.getLocationCoord();
-            } else {
-                failureToConnect = true;
-                socialWifi.removeNetwork(ssid);
-                wifi.setWifiEnabled(false);
-                wifi.setWifiEnabled(true);
-                return null;
-            }
-        }
+//            } else {
+//                failureToConnect = true;
+//                socialWifi.removeNetwork(ssid);
+//                wifi.setWifiEnabled(false);
+//                wifi.setWifiEnabled(true);
+//                return null;
+//            }
+//        }
 
 
-        try {
+	    try {
             Log.d(TAG, "Trying to open socket");
             sk = new Socket();
             SocketAddress remoteaddr = new InetSocketAddress(hostIPstr, serverPort);
