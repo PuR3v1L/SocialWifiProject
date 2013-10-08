@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -82,15 +83,36 @@ public class MainActivity extends Activity implements View.OnClickListener {
         Log.d(TAG, "onResume");
     }
 
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == 1) {
+
+            if(resultCode == RESULT_OK){
+                socialWifi.setSharedPreferenceBoolean("firstTime",true);
+            }
+            if (resultCode == RESULT_CANCELED) {
+                finish();
+            }
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         socialWifi = (SocialWifi) getApplication();
+        if (!socialWifi.getSharedPreferenceBoolean("firstTime")) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivityForResult(intent,1);
+        }
         buttonScan = (Button) findViewById(R.id.buttonScan);
         buttonScan.setOnClickListener(this);
         context = this;
-       /* AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        if (!socialWifi.getSharedPreferenceString("username").equals("")){
+            Toast.makeText(this,"Welcome "+socialWifi.getSharedPreferenceString("username"),Toast.LENGTH_LONG).show();
+        }
+        /* AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
         builder.setView(inflater.inflate(R.layout.loading_dialog,null));
         loadingDialog = builder.create();*/
@@ -109,6 +131,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         simpleAdapter = new SimpleAdapter(this, arrayList, R.layout.row, new String[]{ITEM_KEY}, new int[]{R.id.list_value}) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
+                Log.d(TAG,""+position+" "+arrayList.get(position).get(EXISTS_KEY));
                 View row = super.getView(position, convertView, parent);
                 NoParentPressImageView right = (NoParentPressImageView) row.findViewById(R.id.right);
                 right.setTag(position);
@@ -121,9 +144,17 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     list_value.setOnClickListener(MainActivity.this);
                     right.setImageResource(android.R.drawable.ic_dialog_alert);
                 }
+                else {
+                    list_value.setTextColor(Color.parseColor("#FFFFFF"));
+                    list_value.setBackgroundResource(android.R.color.transparent);
+                    list_value.setOnClickListener(null);
+                    right.setImageResource(android.R.drawable.ic_menu_upload);
+                }
                 return row;
             }
+
         };
+//        simpleAdapter = new InteractiveSimpleAdapter(this, arrayList, R.layout.row, new String[]{ITEM_KEY}, new int[]{R.id.list_value},socialWifi,this);
 
 /*        File file = new File(getFilesDir(), "server.xml");
         if (file.exists()) {
@@ -182,6 +213,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.itemToggleService: // Refresh from server
+                socialWifi.getLocation();
                 UploadToServer uploadToServer = new UploadToServer(this, socialWifi);
                 uploadToServer.execute();
                 break;

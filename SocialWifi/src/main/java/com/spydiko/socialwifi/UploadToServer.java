@@ -3,6 +3,7 @@ package com.spydiko.socialwifi;
 import android.app.Dialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -39,6 +40,7 @@ public class UploadToServer extends AsyncTask<Void, Void, Void> {
     private WifiManager wifi;
     private boolean failureToConnect;
     private String extraInfo;
+    private boolean failureToLocate;
 
     public UploadToServer(Context context, SocialWifi socialWifi) {
         super();
@@ -61,54 +63,57 @@ public class UploadToServer extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... params) {
 
-//        if (add) {
-//            int typeOfEncryption = 0;
-//            if (extraInfo.contains("WEP")) typeOfEncryption = 1;
-//            else if (extraInfo.contains("WAP")) typeOfEncryption = 2;
-//            socialWifi.removeNetwork(ssid);
-//            socialWifi.connect(ssid, password, typeOfEncryption);
-//            /* Check if password is correct and if the phone can connect to the network*/
-//            long current = System.currentTimeMillis();
-//            NetworkInfo networkInfo;
-//            boolean ok = false;
-//            Log.d(TAG, "entered");
-//            connectivityManager = socialWifi.getConnectivityManager();
-//            wifi = socialWifi.getWifi();
-//            while (System.currentTimeMillis() - current < 10000) {
-//                networkInfo = connectivityManager.getActiveNetworkInfo();
-//                try {
-//                    if (networkInfo != null && wifi.getConnectionInfo().getBSSID().equals(bssid)) {
-//                        ok = true;
-//                        Log.d(TAG, "correct pass");
-//                        wifi.saveConfiguration();
-//                        break;
-//                    }
-//                } catch (Exception e) {
-//
-//                }
-//            }
-//            if (ok) {
-
-            /* Get current location through wifi*/
-                while (!socialWifi.isGotLocation()) {
-                    try {
-                        Thread.sleep(300);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+        if (add) {
+            int typeOfEncryption = 0;
+            if (extraInfo.contains("WEP")) typeOfEncryption = 1;
+            else if (extraInfo.contains("WAP")) typeOfEncryption = 2;
+            socialWifi.removeNetwork(ssid);
+            socialWifi.connect(ssid, password, typeOfEncryption);
+            /* Check if password is correct and if the phone can connect to the network*/
+            long current = System.currentTimeMillis();
+            NetworkInfo networkInfo;
+            boolean ok = false;
+            Log.d(TAG, "entered");
+            location = null;
+            connectivityManager = socialWifi.getConnectivityManager();
+            wifi = socialWifi.getWifi();
+            while (System.currentTimeMillis() - current < 10000) {
+                networkInfo = connectivityManager.getActiveNetworkInfo();
+                try {
+                    if (networkInfo != null && wifi.getConnectionInfo().getBSSID().equals(bssid)) {
+                        ok = true;
+                        Log.d(TAG, "correct pass");
+                        wifi.saveConfiguration();
+                        break;
                     }
+                } catch (Exception e) {
+
                 }
-                location = socialWifi.getLocationCoord();
-//            } else {
-//                failureToConnect = true;
-//                socialWifi.removeNetwork(ssid);
-//                wifi.setWifiEnabled(false);
-//                wifi.setWifiEnabled(true);
-//                return null;
-//            }
-//        }
+            }
+            if (!ok) {
+                failureToConnect = true;
+                socialWifi.removeNetwork(ssid);
+                wifi.setWifiEnabled(false);
+                wifi.setWifiEnabled(true);
+                return null;
+            }
+        }
+        long current = System.currentTimeMillis();
+        /* Get current location through wifi*/
+        while (!socialWifi.isGotLocation() && System.currentTimeMillis() - current < 10000) {
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        if (!socialWifi.isGotLocation()) {
+            failureToLocate = true;
+            return null;
+        }
+        location = socialWifi.getLocationCoord();
 
-
-	    try {
+        try {
             Log.d(TAG, "Trying to open socket");
             sk = new Socket();
             SocketAddress remoteaddr = new InetSocketAddress(hostIPstr, serverPort);
@@ -131,9 +136,10 @@ public class UploadToServer extends AsyncTask<Void, Void, Void> {
                 Log.d(TAG, "Password add sent");
             } else {
                 dos.writeBytes("update" + "\r\n");
-                dos.writeBytes("3.3" + "\r\n");
-                dos.writeBytes("52.523742" + "\r\n");
-                dos.writeBytes("13.412333" + "\r\n");
+                dos.writeBytes(String.valueOf(socialWifi.getAreaRadius()) + "\r\n");
+                dos.writeBytes(Double.toString(location[0]) + "\r\n");
+                dos.writeBytes(Double.toString(location[1]) + "\r\n");
+                Log.d(TAG,"Sent: "+String.valueOf(socialWifi.getAreaRadius())+" "+Double.toString(location[0])+" "+Double.toString(location[1]));
                 size = Integer.parseInt(dis.readLine());
                 Log.d(TAG, "Size: " + size);
                 buffer = new byte[size];
@@ -148,6 +154,7 @@ public class UploadToServer extends AsyncTask<Void, Void, Void> {
         return null;
     }
 
+
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
@@ -157,9 +164,7 @@ public class UploadToServer extends AsyncTask<Void, Void, Void> {
         loadingDialog.setCancelable(false);
         loadingDialog.show();
         failureToConnect = false;
-        if (add) {
-
-        }
+        failureToLocate = false;
     }
 
     @Override
@@ -167,6 +172,8 @@ public class UploadToServer extends AsyncTask<Void, Void, Void> {
         super.onPostExecute(aVoid);
         if (failureToConnect) {
             Toast.makeText(context, "Error connecting to network\nCheck password", Toast.LENGTH_SHORT).show();
+        } else if (failureToLocate) {
+            Toast.makeText(context, "Failure to localize\nCheck connection", Toast.LENGTH_SHORT).show();
         } else {
             Log.d(TAG, "onPostExecute");
             try {
@@ -187,8 +194,7 @@ public class UploadToServer extends AsyncTask<Void, Void, Void> {
                         socialWifi.storeXML(buffer);
                         socialWifi.setWifies(socialWifi.readFromXML("server.xml"));
                         Toast.makeText(context, "Success!", Toast.LENGTH_SHORT).show();
-                    }
-                    else {
+                    } else {
                         Toast.makeText(context, "Error updating...\nTry again later...", Toast.LENGTH_SHORT).show();
                     }
                 }

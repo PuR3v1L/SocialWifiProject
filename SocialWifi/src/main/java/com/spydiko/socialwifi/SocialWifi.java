@@ -325,6 +325,24 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 		if (s.equals("area_radius_list")) setAreaRadius(Float.valueOf(sharedPreferences.getString("area_radius_list", "3")));
 
 	}
+
+    public void setSharedPreferenceBoolean (String pref, Boolean value) {
+        editor.putBoolean(pref,value);
+        editor.commit();
+    }
+
+    public boolean getSharedPreferenceBoolean (String pref) {
+        return prefs.getBoolean(pref,false);
+    }
+
+    public void setSharedPreferenceString (String pref, String value) {
+        editor.putString(pref,value);
+        editor.commit();
+    }
+
+    public String getSharedPreferenceString (String pref) {
+        return prefs.getString(pref,"");
+    }
 	
     private class MyLocationListener implements LocationListener {
 
