@@ -445,8 +445,15 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
         conf.SSID = "\"" + networkSSID + "\"";   // Please note the quotes. String should contain ssid in quotes
         // Case of WPA
         switch (typeOfEncryption) {
-            case 2:
-                Log.d(TAG, "WPA");
+	        case 1:
+		        Log.d(TAG, "WEP");
+		        conf.wepKeys[0] = "\"" + networkPass + "\"";
+		        conf.wepTxKeyIndex = 0;
+		        conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+		        conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
+		        break;
+	        case 2:
+		        Log.d(TAG, "WPA");
                 conf.preSharedKey = "\"" + networkPass + "\"";
                 break;
 	        case 3:
