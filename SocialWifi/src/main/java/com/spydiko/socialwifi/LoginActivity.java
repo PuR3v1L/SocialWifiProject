@@ -230,16 +230,16 @@ public class LoginActivity extends Activity {
             try {
                 sk = new Socket();
                 SocketAddress remoteaddr = new InetSocketAddress(hostIPstr, serverPort);
-                sk.connect(remoteaddr, 5000);
-                sk.setSoTimeout(5000);
-                Log.d(TAG, "Socket opened");
+	            sk.setSoTimeout(5000);
+	            sk.connect(remoteaddr, 5000);
+	            Log.d(TAG, "Socket opened");
                 dos = new DataOutputStream(sk.getOutputStream());
                 dis = new DataInputStream(sk.getInputStream());
                 Log.d(TAG, "Trying to sent message");
                 dos.writeBytes(action + "\r\n");
                 dos.writeBytes(mEmail + "\r\n");
-                dos.writeBytes(macAddress + "\r\n");
-                dos.writeBytes(mPassword + "\r\n");
+//                dos.writeBytes(macAddress + "\r\n");
+	            dos.writeBytes(mPassword + "\r\n");
                 response = dis.readLine();
             } catch (SocketException e) {
                 e.printStackTrace();
@@ -248,8 +248,8 @@ public class LoginActivity extends Activity {
             }
             if (response == null) {
                 return false;
-            } else if (response.equals("APPROVED")) {
-                return true;
+            } else if (response.equals("ok")) {
+	            return true;
             } else {
                 return false;
             }
@@ -270,8 +270,8 @@ public class LoginActivity extends Activity {
                 dos.close();
                 dis.close();
                 sk.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+	            e.printStackTrace();
             }
             if (success) {
                 Toast.makeText(context, "OK!", Toast.LENGTH_SHORT).show();
@@ -279,12 +279,9 @@ public class LoginActivity extends Activity {
                 temp.done();
                 finish();
             } else {
-                if (sign_in) mPasswordView.setError(getString(R.string.error_incorrect_password));
-                else {
-                    mPasswordView.setError(getString(R.string.error_incorrect_password));
-                    mEmailView.setError(getString(R.string.error_incorrect_cred));
-                }
-//                mPasswordView.requestFocus();
+//	            mPasswordView.setError(getString(R.string.error_incorrect_password));
+	            mEmailView.setError(getString(R.string.error_incorrect_cred));
+	            mEmailView.requestFocus();
             }
         }
 

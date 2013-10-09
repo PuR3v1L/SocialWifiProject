@@ -126,13 +126,17 @@ public class UploadToServer extends AsyncTask<Void, Void, Boolean> {
 			Log.d(TAG, Double.toString(location[1]));
 			dos.writeBytes(Double.toString(location[0]) + "\r\n");
 			dos.writeBytes(Double.toString(location[1]) + "\r\n");
+			Log.d(TAG, ssid);
 			dos.writeBytes(ssid + "\r\n");
+			Log.d(TAG, bssid);
 			dos.writeBytes(bssid + "\r\n");
+			Log.d(TAG, password);
 			dos.writeBytes(password + "\r\n");
+			Log.d(TAG, socialWifi.getSharedPreferenceString("username"));
 			dos.writeBytes(socialWifi.getSharedPreferenceString("username") + "\r\n");
 			Log.d(TAG, "Password add sent");
 			response = dis.readLine();
-			if (response.equals("APPROVED")) return true;
+			if (response.equals("Done")) return true;
 			else return false;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -150,8 +154,8 @@ public class UploadToServer extends AsyncTask<Void, Void, Boolean> {
 			Log.d(TAG, "Trying to open socket");
 			sk = new Socket();
 			SocketAddress remoteaddr = new InetSocketAddress(hostIPstr, serverPort);
-			sk.connect(remoteaddr, 10000);
 			sk.setSoTimeout(10000);
+			sk.connect(remoteaddr);
 			buffer = null;
 			Log.d(TAG, "Socket opened");
 			dos = new DataOutputStream(sk.getOutputStream());
@@ -209,7 +213,7 @@ public class UploadToServer extends AsyncTask<Void, Void, Boolean> {
 		location = null;
 		connectivityManager = socialWifi.getConnectivityManager();
 		wifi = socialWifi.getWifi();
-		while (System.currentTimeMillis() - current < 20000) {
+		while (System.currentTimeMillis() - current < 10000) {
 			networkInfo = connectivityManager.getActiveNetworkInfo();
 			try {
 				if (networkInfo != null && networkInfo.isConnected() && wifi.getConnectionInfo().getBSSID().equals(bssid)) {
@@ -251,6 +255,8 @@ public class UploadToServer extends AsyncTask<Void, Void, Boolean> {
 			Toast.makeText(context, "Error connecting to network\nCheck password", Toast.LENGTH_SHORT).show();
 		} else if (failureToLocate) {
 			Toast.makeText(context, "Failure to localize\nCheck connection", Toast.LENGTH_SHORT).show();
+		} else if (!aBool) {
+			Toast.makeText(context, "Failure to contact server\nCheck connection", Toast.LENGTH_SHORT).show();
 		} else {
 			Log.d(TAG, "onPostExecute");
 			try {
