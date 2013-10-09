@@ -238,7 +238,7 @@ public class LoginActivity extends Activity {
                 Log.d(TAG, "Trying to sent message");
                 dos.writeBytes(action + "\r\n");
                 dos.writeBytes(mEmail + "\r\n");
-//                dos.writeBytes(macAddress + "\r\n");
+	            dos.writeBytes(macAddress + "\r\n");
 	            dos.writeBytes(mPassword + "\r\n");
                 response = dis.readLine();
             } catch (SocketException e) {
@@ -248,7 +248,7 @@ public class LoginActivity extends Activity {
             }
             if (response == null) {
                 return false;
-            } else if (response.equals("ok")) {
+            } else if (response.equals("Done")) {
 	            return true;
             } else {
                 return false;
@@ -267,9 +267,9 @@ public class LoginActivity extends Activity {
             showProgress(false);
             Log.d(TAG, "Closing Everything");
             try {
-                dos.close();
-                dis.close();
-                sk.close();
+	            sk.close();
+	            dos.close();
+	            dis.close();
             } catch (Exception e) {
 	            e.printStackTrace();
             }

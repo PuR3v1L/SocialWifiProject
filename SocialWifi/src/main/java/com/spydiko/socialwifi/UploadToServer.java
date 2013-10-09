@@ -20,7 +20,6 @@ import java.util.ArrayList;
 /**
  * Created by spiros on 10/2/13.
  * This AsyncTask handles the communication with the server. It asks for a refresh or it tries to upload a new password.
- *
  */
 public class UploadToServer extends AsyncTask<Void, Void, Boolean> {
 
@@ -259,33 +258,34 @@ public class UploadToServer extends AsyncTask<Void, Void, Boolean> {
 			Toast.makeText(context, "Failure to contact server\nCheck connection", Toast.LENGTH_SHORT).show();
 		} else {
 			Log.d(TAG, "onPostExecute");
-			try {
-				Log.d(TAG, "Closing Everything");
-				dos.close();
-				dis.close();
-				sk.close();
-				if (add) {
-					ArrayList<WifiPass> tmp = socialWifi.getWifies();
-					ArrayList<Double> loc = new ArrayList<Double>();
-					loc.add(0, location[0]);
-					loc.add(1, location[1]);
-					tmp.add(new WifiPass(ssid, bssid, password, loc));
-					socialWifi.setWifies(tmp);
-					Toast.makeText(context, "Success!\nNew password stored!", Toast.LENGTH_SHORT).show();
+			if (add) {
+				ArrayList<WifiPass> tmp = socialWifi.getWifies();
+				ArrayList<Double> loc = new ArrayList<Double>();
+				loc.add(0, location[0]);
+				loc.add(1, location[1]);
+				tmp.add(new WifiPass(ssid, bssid, password, loc));
+				socialWifi.setWifies(tmp);
+				Toast.makeText(context, "Success!\nNew password stored!", Toast.LENGTH_SHORT).show();
+			} else {
+				if (buffer != null) {
+					socialWifi.storeXML(buffer);
+					socialWifi.setWifies(socialWifi.readFromXML("server.xml"));
+					Toast.makeText(context, "Success!", Toast.LENGTH_SHORT).show();
 				} else {
-					if (buffer != null) {
-						socialWifi.storeXML(buffer);
-						socialWifi.setWifies(socialWifi.readFromXML("server.xml"));
-						Toast.makeText(context, "Success!", Toast.LENGTH_SHORT).show();
-					} else {
-						Toast.makeText(context, "Error updating...\nTry again later...", Toast.LENGTH_SHORT).show();
-					}
+					Toast.makeText(context, "Error updating...\nTry again later...", Toast.LENGTH_SHORT).show();
 				}
-				socialWifi.getWifi().startScan();
-			} catch (Exception e) {
-				Toast.makeText(context, "Error updating...\nTry again later...", Toast.LENGTH_SHORT).show();
-				e.printStackTrace();
 			}
+			socialWifi.getWifi().startScan();
+
+		}
+		Log.d(TAG, "Closing Everything");
+		try {
+			sk.close();
+			dos.close();
+			dis.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			Toast.makeText(context, "Error updating...\nTry again later...", Toast.LENGTH_SHORT).show();
 		}
 		loadingDialog.dismiss();
 	}
