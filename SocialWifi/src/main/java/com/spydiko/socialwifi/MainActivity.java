@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -155,7 +156,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 				return row;
 			}
 
-		};
+        };
 //        simpleAdapter = new InteractiveSimpleAdapter(this, arrayList, R.layout.row, new String[]{ITEM_KEY}, new int[]{R.id.list_value},socialWifi,this);
 
 /*        File file = new File(getFilesDir(), "server.xml");
@@ -278,13 +279,29 @@ public class MainActivity extends Activity implements View.OnClickListener {
 					uploadDialog.show();
 				}
 
-				break;
-			case (R.id.list_value):
-				clickedWifi = (HashMap<String, String>) simpleAdapter.getItem((Integer) v.getTag());
-				Toast.makeText(this, "Selected...\n" + clickedWifi.get(ITEM_KEY), Toast.LENGTH_SHORT).show();
-				break;
-			default:
-				break;
-		}
-	}
+                break;
+            case (R.id.list_value):
+                clickedWifi = (HashMap<String, String>) simpleAdapter.getItem((Integer) v.getTag());
+                int typeOfEncryption = 0;
+                String extraInfo = clickedWifi.get(EXTRAS_KEY);
+                String ssid = clickedWifi.get(ITEM_KEY);
+                String bssid = clickedWifi.get(BSSID_KEY);
+                String password = null;
+                for (WifiPass wifiPass : socialWifi.getWifies()){
+                    if (wifiPass.getSsid().equals(ssid)){
+                        if (wifiPass.getBssid().equals(bssid)){
+                            password = wifiPass.getPassword();
+                        }
+                    }
+                }
+                if (extraInfo.contains("WEP")) typeOfEncryption = 1;
+                else if (extraInfo.contains("WAP")) typeOfEncryption = 2;
+                socialWifi.removeNetwork(ssid);
+                socialWifi.connect(ssid, password, typeOfEncryption);
+//                Toast.makeText(this, "Selected...\n" + clickedWifi.get(ITEM_KEY), Toast.LENGTH_SHORT).show();
+                break;
+            default:
+                break;
+        }
+    }
 }

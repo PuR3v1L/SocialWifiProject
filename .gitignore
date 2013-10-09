@@ -32,6 +32,11 @@ proguard/
 *.iws
 .idea/
 
+#################
+## Android Studio
+#################
+
+.gradle
 
 #################
 ## Eclipse
