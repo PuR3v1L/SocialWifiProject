@@ -14,6 +14,8 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.Xml;
 
+import com.bugsense.trace.BugSenseHandler;
+
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -28,6 +30,7 @@ import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Created by jim on 5/9/2013.
@@ -51,8 +54,9 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 
     public void onCreate() {
         super.onCreate();
-        wifies = new ArrayList<WifiPass>();
-        wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+	    BugSenseHandler.initAndStartSession(this, "6acdeebc");
+	    wifies = new ArrayList<WifiPass>();
+	    wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 	    prefs = PreferenceManager.getDefaultSharedPreferences(this);
 	    prefs.registerOnSharedPreferenceChangeListener(this);
@@ -435,7 +439,8 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
         }
     }
 
-    public void connect(String networkSSID, String networkPass, int typeOfEncryption) {
+
+	public void connect(String networkSSID, String networkPass, int typeOfEncryption) {
         WifiConfiguration conf = new WifiConfiguration();
         conf.SSID = "\"" + networkSSID + "\"";   // Please note the quotes. String should contain ssid in quotes
         // Case of WPA
@@ -444,7 +449,11 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
                 Log.d(TAG, "WPA");
                 conf.preSharedKey = "\"" + networkPass + "\"";
                 break;
-            default:
+	        case 3:
+		        Log.d(TAG, "WPA2");
+		        conf.preSharedKey = quoteNonHex(networkPass, 64);
+		        break;
+	        default:
                 break;
         }
         conf.status = WifiConfiguration.Status.ENABLED;
@@ -472,4 +481,49 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
         }
 
     }
+
+	private static String quoteNonHex(String value, int... allowedLengths) {
+		return isHexOfLength(value, allowedLengths) ? value : convertToQuotedString(value);
+	}
+
+	/**
+	 * Encloses the incoming string inside double quotes, if it isn't already quoted.
+	 *
+	 * @param string the input string
+	 * @return a quoted string, of the form "input".  If the input string is null, it returns null
+	 * as well.
+	 */
+	private static String convertToQuotedString(String string) {
+		if (string == null || string.length() == 0) {
+			return null;
+		}
+		// If already quoted, return as-is
+		if (string.charAt(0) == '"' && string.charAt(string.length() - 1) == '"') {
+			return string;
+		}
+		return '\"' + string + '\"';
+	}
+
+	private static final Pattern HEX_DIGITS = Pattern.compile("[0-9A-Fa-f]+");
+
+	/**
+	 * @param value          input to check
+	 * @param allowedLengths allowed lengths, if any
+	 * @return true if value is a non-null, non-empty string of hex digits, and if allowed lengths are given, has
+	 * an allowed length
+	 */
+	private static boolean isHexOfLength(CharSequence value, int... allowedLengths) {
+		if (value == null || !HEX_DIGITS.matcher(value).matches()) {
+			return false;
+		}
+		if (allowedLengths.length == 0) {
+			return true;
+		}
+		for (int length : allowedLengths) {
+			if (value.length() == length) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

@@ -20,15 +20,15 @@ import java.util.ArrayList;
 /**
  * Created by spiros on 10/2/13.
  */
-public class UploadToServer extends AsyncTask<Void, Void, Void> {
+public class UploadToServer extends AsyncTask<Void, Void, Boolean> {
 
-    private static final String TAG = UploadToServer.class.getSimpleName();
+	private static final String TAG = UploadToServer.class.getSimpleName();
     private Context context;
     private Socket sk;
     private DataOutputStream dos;
     private DataInputStream dis;
-    private String hostIPstr = "155.207.133.206";
-    private int serverPort = 44444;
+	private String hostIPstr = "83.212.121.161";
+	private int serverPort = 44444;
     private Dialog loadingDialog;
     private int size;
     private boolean add;
@@ -41,8 +41,9 @@ public class UploadToServer extends AsyncTask<Void, Void, Void> {
     private boolean failureToConnect;
     private String extraInfo;
     private boolean failureToLocate;
+	private String response;
 
-    public UploadToServer(Context context, SocialWifi socialWifi) {
+	public UploadToServer(Context context, SocialWifi socialWifi) {
         super();
         this.socialWifi = socialWifi;
         this.context = context;
@@ -61,12 +62,14 @@ public class UploadToServer extends AsyncTask<Void, Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(Void... params) {
+    protected Boolean doInBackground(Void... params) {
 
-        if (add) {
+	    if (add) {
             int typeOfEncryption = 0;
-            if (extraInfo.contains("WEP")) typeOfEncryption = 1;
-            else if (extraInfo.contains("WAP")) typeOfEncryption = 2;
+		    Log.d(TAG, "extraInfo: " + extraInfo);
+		    if (extraInfo.contains("WEP")) typeOfEncryption = 1;
+		    else if (extraInfo.contains("WPA2")) typeOfEncryption = 3;
+		    else if (extraInfo.contains("WAP")) typeOfEncryption = 2;
             socialWifi.removeNetwork(ssid);
             socialWifi.connect(ssid, password, typeOfEncryption);
             /* Check if password is correct and if the phone can connect to the network*/
@@ -77,11 +80,11 @@ public class UploadToServer extends AsyncTask<Void, Void, Void> {
             location = null;
             connectivityManager = socialWifi.getConnectivityManager();
             wifi = socialWifi.getWifi();
-            while (System.currentTimeMillis() - current < 10000) {
-                networkInfo = connectivityManager.getActiveNetworkInfo();
+		    while (System.currentTimeMillis() - current < 20000) {
+			    networkInfo = connectivityManager.getActiveNetworkInfo();
                 try {
-                    if (networkInfo != null && wifi.getConnectionInfo().getBSSID().equals(bssid)) {
-                        ok = true;
+	                if (networkInfo != null && networkInfo.isConnected() && wifi.getConnectionInfo().getBSSID().equals(bssid)) {
+		                ok = true;
                         Log.d(TAG, "correct pass");
                         wifi.saveConfiguration();
                         break;
@@ -116,10 +119,11 @@ public class UploadToServer extends AsyncTask<Void, Void, Void> {
         try {
             Log.d(TAG, "Trying to open socket");
             sk = new Socket();
-            SocketAddress remoteaddr = new InetSocketAddress(hostIPstr, serverPort);
-            sk.connect(remoteaddr, 5000);
-            sk.setSoTimeout(5000);
-            buffer = null;
+//            SocketAddress remoteaddr = new InetSocketAddress(hostIPstr, serverPort);
+	        SocketAddress remoteaddr = new InetSocketAddress(hostIPstr, 44444);
+	        sk.connect(remoteaddr, 10000);
+	        sk.setSoTimeout(10000);
+	        buffer = null;
             Log.d(TAG, "Socket opened");
             dos = new DataOutputStream(sk.getOutputStream());
             dis = new DataInputStream(sk.getInputStream());
@@ -134,6 +138,9 @@ public class UploadToServer extends AsyncTask<Void, Void, Void> {
                 dos.writeBytes(bssid + "\r\n");
                 dos.writeBytes(password + "\r\n");
                 Log.d(TAG, "Password add sent");
+	            response = dis.readLine();
+	            if (response.equals("APPROVED")) return true;
+	            else return false;
             } else {
                 dos.writeBytes("update" + "\r\n");
                 dos.writeBytes(String.valueOf(socialWifi.getAreaRadius()) + "\r\n");
@@ -147,11 +154,12 @@ public class UploadToServer extends AsyncTask<Void, Void, Void> {
                 sk.setReceiveBufferSize(size);
                 dis.read(buffer);
                 Log.d(TAG, "Messages sent");
+	            return true;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+	    return false;
     }
 
 
@@ -168,9 +176,9 @@ public class UploadToServer extends AsyncTask<Void, Void, Void> {
     }
 
     @Override
-    protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
-        if (failureToConnect) {
+    protected void onPostExecute(Boolean aBool) {
+	    super.onPostExecute(aBool);
+	    if (failureToConnect) {
             Toast.makeText(context, "Error connecting to network\nCheck password", Toast.LENGTH_SHORT).show();
         } else if (failureToLocate) {
             Toast.makeText(context, "Failure to localize\nCheck connection", Toast.LENGTH_SHORT).show();

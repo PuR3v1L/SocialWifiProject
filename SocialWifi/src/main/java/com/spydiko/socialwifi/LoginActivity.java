@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
@@ -46,8 +45,8 @@ public class LoginActivity extends Activity {
     private View mLoginFormView;
     private View mLoginStatusView;
     private TextView mLoginStatusMessageView;
-    private String hostIPstr = "155.207.133.206";
-    private int serverPort = 44444;
+	private String hostIPstr = "83.212.121.161";
+	private int serverPort = 44444;
     private static final String TAG = "LoginActivity";
 
     @Override
@@ -238,7 +237,8 @@ public class LoginActivity extends Activity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            if (response.equals("APPROVED")) return true;
+
+	        if (response.equals("APPROVED")) return true;
             else return false;
 
         }
