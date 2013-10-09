@@ -37,6 +37,7 @@ public class LoginActivity extends Activity {
     // Values for email and password at the time of the login attempt.
     private String mEmail;
     private String mPassword;
+    private String macAddress;
 
     // UI references.
     private SocialWifi socialWifi;
@@ -45,8 +46,8 @@ public class LoginActivity extends Activity {
     private View mLoginFormView;
     private View mLoginStatusView;
     private TextView mLoginStatusMessageView;
-	private String hostIPstr = "83.212.121.161";
-	private int serverPort = 44444;
+    private String hostIPstr = "83.212.121.161";
+    private int serverPort = 44444;
     private static final String TAG = "LoginActivity";
 
     @Override
@@ -63,7 +64,6 @@ public class LoginActivity extends Activity {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
                     return true;
                 }
                 return false;
@@ -71,7 +71,7 @@ public class LoginActivity extends Activity {
         });
 
         socialWifi = (SocialWifi) getApplication();
-
+        macAddress = socialWifi.getWifi().getConnectionInfo().getMacAddress();
         mLoginFormView = findViewById(R.id.login_form);
         mLoginStatusView = findViewById(R.id.login_status);
         mLoginStatusMessageView = (TextView) findViewById(R.id.login_status_message);
@@ -79,7 +79,13 @@ public class LoginActivity extends Activity {
         findViewById(R.id.sign_in_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptLogin();
+                attemptLogin(true);
+            }
+        });
+        findViewById(R.id.register_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                attemptLogin(false);
             }
         });
     }
@@ -90,7 +96,7 @@ public class LoginActivity extends Activity {
      * errors are presented and no actual login attempt is made.
      */
 
-    public void attemptLogin() {
+    public void attemptLogin(boolean sign_in) {
         if (mAuthTask != null) {
             return;
         }
@@ -111,7 +117,7 @@ public class LoginActivity extends Activity {
             mPasswordView.setError(getString(R.string.error_field_required));
             focusView = mPasswordView;
             cancel = true;
-        } else if (mPassword.length() < 4) {
+        } else if (mPassword.length() < 6) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
@@ -122,7 +128,7 @@ public class LoginActivity extends Activity {
             mEmailView.setError(getString(R.string.error_field_required));
             focusView = mEmailView;
             cancel = true;
-        } else if (!mEmail.contains("@")) {
+        } else if (mEmail.length() < 6) {
             mEmailView.setError(getString(R.string.error_invalid_email));
             focusView = mEmailView;
             cancel = true;
@@ -137,7 +143,8 @@ public class LoginActivity extends Activity {
             // perform the user login attempt.
             mLoginStatusMessageView.setText(R.string.login_progress_signing_in);
             showProgress(true);
-            mAuthTask = new UserLoginTask(this);
+            if (sign_in) mAuthTask = new UserLoginTask(this, true);
+            else mAuthTask = new UserLoginTask(this);
             mAuthTask.execute((Void) null);
         }
     }
@@ -205,42 +212,53 @@ public class LoginActivity extends Activity {
 
         private Context context;
         private Socket sk;
-        private byte[] buffer;
         private DataOutputStream dos;
         private DataInputStream dis;
         private String response;
+        private boolean sign_in;
 
         public UserLoginTask(Context loginActivity) {
             this.context = loginActivity;
         }
 
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
+        public UserLoginTask(Context loginActivity, boolean sign_in) {
+            this.context = loginActivity;
+            this.sign_in = sign_in;
+        }
+
+        public boolean sendCredentials(String action) {
             try {
                 sk = new Socket();
                 SocketAddress remoteaddr = new InetSocketAddress(hostIPstr, serverPort);
                 sk.connect(remoteaddr, 5000);
                 sk.setSoTimeout(5000);
-                buffer = null;
                 Log.d(TAG, "Socket opened");
                 dos = new DataOutputStream(sk.getOutputStream());
                 dis = new DataInputStream(sk.getInputStream());
                 Log.d(TAG, "Trying to sent message");
-                dos.writeBytes("login" + "\r\n");
+                dos.writeBytes(action + "\r\n");
                 dos.writeBytes(mEmail + "\r\n");
+                dos.writeBytes(macAddress + "\r\n");
                 dos.writeBytes(mPassword + "\r\n");
                 response = dis.readLine();
-                // Simulate network access.
             } catch (SocketException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            if (response == null) {
+                return false;
+            } else if (response.equals("APPROVED")) {
+                return true;
+            } else {
+                return false;
+            }
+        }
 
-	        if (response.equals("APPROVED")) return true;
-            else return false;
-
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            if (sign_in) return sendCredentials("login");
+            else return sendCredentials("register");
         }
 
         @Override
@@ -261,8 +279,12 @@ public class LoginActivity extends Activity {
                 temp.done();
                 finish();
             } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
+                if (sign_in) mPasswordView.setError(getString(R.string.error_incorrect_password));
+                else {
+                    mPasswordView.setError(getString(R.string.error_incorrect_password));
+                    mEmailView.setError(getString(R.string.error_incorrect_cred));
+                }
+//                mPasswordView.requestFocus();
             }
         }
 

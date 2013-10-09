@@ -20,13 +20,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.xmlpull.v1.XmlSerializer;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -41,11 +38,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
 	private final static String TAG = MainActivity.class.getSimpleName();
 	private SocialWifi socialWifi;
 	private Button buttonScan;
-	private XmlSerializer xs;
 	private SimpleAdapter simpleAdapter;
 	private ArrayList<HashMap<String, String>> arrayList;
 	private HashMap<String, String> clickedWifi;
-	private Dialog loadingDialog;
 	private ListView lv;
 	private String ITEM_KEY = "key", BSSID_KEY = "bssid", EXISTS_KEY = "exist", EXTRAS_KEY = "extra";
 	private BroadcastReceiver broadcastReceiver;
@@ -252,56 +247,78 @@ public class MainActivity extends Activity implements View.OnClickListener {
 				clickedWifi = (HashMap<String, String>) simpleAdapter.getItem((Integer) v.getTag());
 				if (clickedWifi.get(EXISTS_KEY).equals("y")) {
 					Toast.makeText(this, "Error button clicked...\n" + clickedWifi.get(ITEM_KEY), Toast.LENGTH_SHORT).show();
+                    reportNewPassword();
 				} else {
 					Toast.makeText(this, "Upload button clicked...\n" + clickedWifi.get(ITEM_KEY), Toast.LENGTH_SHORT).show();
-					AlertDialog.Builder builder = new AlertDialog.Builder(this);
-					LayoutInflater inflater = this.getLayoutInflater();
-					final View view = inflater.inflate(R.layout.upload_dialog, null);
-					builder.setView(view)
-							.setPositiveButton(R.string.uploadPassword, new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog, int id) {
-									EditText password = (EditText) view.findViewById(R.id.dialog_password);
-									socialWifi.getLocation();
-									UploadToServer uploadToServer = new UploadToServer(clickedWifi.get(ITEM_KEY), clickedWifi.get(BSSID_KEY), password.getText().toString(), context, socialWifi, clickedWifi.get(EXTRAS_KEY));
-									uploadToServer.execute();
-									dialog.dismiss();
-								}
-							})
-							.setNegativeButton(R.string.cancelUploadPassword, new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int id) {
-									dialog.dismiss();
-								}
-							});
-					TextView ssid = (TextView) view.findViewById(R.id.dialog_ssid);
-					ssid.setText(clickedWifi.get(ITEM_KEY));
-					Dialog uploadDialog = builder.create();
-					uploadDialog.show();
+                    uploadPassword();
 				}
-
                 break;
             case (R.id.list_value):
                 clickedWifi = (HashMap<String, String>) simpleAdapter.getItem((Integer) v.getTag());
-                int typeOfEncryption = 0;
-                String extraInfo = clickedWifi.get(EXTRAS_KEY);
-                String ssid = clickedWifi.get(ITEM_KEY);
-                String bssid = clickedWifi.get(BSSID_KEY);
-                String password = null;
-                for (WifiPass wifiPass : socialWifi.getWifies()){
-                    if (wifiPass.getSsid().equals(ssid)){
-                        if (wifiPass.getBssid().equals(bssid)){
-                            password = wifiPass.getPassword();
-                        }
-                    }
-                }
-                if (extraInfo.contains("WEP")) typeOfEncryption = 1;
-                else if (extraInfo.contains("WAP")) typeOfEncryption = 2;
-                socialWifi.removeNetwork(ssid);
-                socialWifi.connect(ssid, password, typeOfEncryption);
-//                Toast.makeText(this, "Selected...\n" + clickedWifi.get(ITEM_KEY), Toast.LENGTH_SHORT).show();
+                connectWithPassword();
                 break;
             default:
                 break;
         }
+    }
+
+    /**
+     * Using the credentials provided by the server, attempt to connect to the selected network.
+     */
+    public void connectWithPassword() {
+        int typeOfEncryption = 0;
+        String extraInfo = clickedWifi.get(EXTRAS_KEY);
+        String ssid = clickedWifi.get(ITEM_KEY);
+        String bssid = clickedWifi.get(BSSID_KEY);
+        String password = null;
+        for (WifiPass wifiPass : socialWifi.getWifies()){
+            if (wifiPass.getSsid().equals(ssid)){
+                if (wifiPass.getBssid().equals(bssid)){
+                    password = wifiPass.getPassword();
+                }
+            }
+        }
+        if (extraInfo.contains("WEP")) typeOfEncryption = 1;
+        else if (extraInfo.contains("WPA2")) typeOfEncryption = 3;
+        else if (extraInfo.contains("WAP")) typeOfEncryption = 2;
+        socialWifi.removeNetwork(ssid);
+        socialWifi.connect(ssid, password, typeOfEncryption);
+//                Toast.makeText(this, "Selected...\n" + clickedWifi.get(ITEM_KEY), Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Open a dialog to input the password and upload the password to the server.
+     */
+    public void uploadPassword() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = this.getLayoutInflater();
+        final View view = inflater.inflate(R.layout.upload_dialog, null);
+        builder.setView(view)
+                .setPositiveButton(R.string.uploadPassword, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        EditText password = (EditText) view.findViewById(R.id.dialog_password);
+                        socialWifi.getLocation();
+                        UploadToServer uploadToServer = new UploadToServer(clickedWifi.get(ITEM_KEY), clickedWifi.get(BSSID_KEY), password.getText().toString(), context, socialWifi, clickedWifi.get(EXTRAS_KEY));
+                        uploadToServer.execute();
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton(R.string.cancelUploadPassword, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                    }
+                });
+        TextView ssid = (TextView) view.findViewById(R.id.dialog_ssid);
+        ssid.setText(clickedWifi.get(ITEM_KEY));
+        Dialog uploadDialog = builder.create();
+        uploadDialog.show();
+    }
+
+    /**
+     * Send the new, corrected password to the server, considering current password is not working.
+     */
+    public void reportNewPassword() {
+        //todo update the server with new credentials for this network
     }
 }
