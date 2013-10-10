@@ -9,11 +9,14 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,8 +52,9 @@ public class LoginActivity extends Activity {
     private String hostIPstr = "83.212.121.161";
     private int serverPort = 44444;
     private static final String TAG = "LoginActivity";
+	private CheckBox showPasswordCB;
 
-    @Override
+	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -88,7 +92,20 @@ public class LoginActivity extends Activity {
                 attemptLogin(false);
             }
         });
-    }
+
+		showPasswordCB = (CheckBox) findViewById(R.id.show_password_login);
+		showPasswordCB.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+				EditText password = (EditText) findViewById(R.id.password);
+				if (b) {
+					password.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+				} else {
+					password.setInputType(129);
+				}
+			}
+		});
+	}
 
     /**
      * Attempts to sign in or register the account specified by the login form.

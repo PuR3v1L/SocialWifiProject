@@ -1,10 +1,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/itemToggleService"
-        android:title="@string/updateFromServer"
-        android:icon="@android:drawable/stat_notify_sync"
-        android:showAsAction="ifRoom"/>
+            android:id="@+id/itemToggleService"
+            android:title="@string/updateFromServer"
+            android:icon="@android:drawable/stat_notify_sync"
+            android:showAsAction="ifRoom"/>
     <item
             android:id="@+id/preferences"
             android:title="@string/preferences"/>
+    <item
+            android:id="@+id/logout"
+            android:title="@string/logout"/>
 </menu>

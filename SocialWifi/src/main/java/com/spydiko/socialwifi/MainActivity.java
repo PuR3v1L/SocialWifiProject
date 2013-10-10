@@ -12,6 +12,7 @@ import android.graphics.Color;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,6 +20,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -46,6 +49,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
 	private BroadcastReceiver broadcastReceiver;
 	private FileOutputStream outputStream;
 	private Context context;
+	private TextView usernameTextView;
+	private CheckBox showPasswordCB;
 
 	@Override
 	protected void onStop() {
@@ -88,12 +93,15 @@ public class MainActivity extends Activity implements View.OnClickListener {
 		if (requestCode == 1) {
 
 			if (resultCode == RESULT_OK) {
-				socialWifi.setSharedPreferenceBoolean("firstTime", true);
+				socialWifi.setSharedPreferenceBoolean("notFirstTime", true);
 			}
 			if (resultCode == RESULT_CANCELED) {
 				finish();
 			}
+
+			usernameTextView.setText(socialWifi.getSharedPreferenceString("username") + " ");
 		}
+
 	}
 
 	@Override
@@ -101,7 +109,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		socialWifi = (SocialWifi) getApplication();
-		if (!socialWifi.getSharedPreferenceBoolean("firstTime")) {
+		usernameTextView = (TextView) findViewById(R.id.usernameTextView);
+		if (!socialWifi.getSharedPreferenceBoolean("notFirstTime")) {
 			Intent intent = new Intent(this, LoginActivity.class);
 			startActivityForResult(intent, 1);
 		}
@@ -109,11 +118,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
 		buttonScan.setOnClickListener(this);
 		context = this;
 
-		if (!socialWifi.getSharedPreferenceString("username").equals("")) {
-			Toast.makeText(this, "Welcome " + socialWifi.getSharedPreferenceString("username"), Toast.LENGTH_LONG).show();
-		}
+//		if (!socialWifi.getSharedPreferenceString("username").equals("")) {
+//			Toast.makeText(this, "Welcome " + socialWifi.getSharedPreferenceString("username"), Toast.LENGTH_LONG).show();
+//		}
+
+		usernameTextView.setText(socialWifi.getSharedPreferenceString("username") + " ");
 		/* AlertDialog.Builder builder = new AlertDialog.Builder(this);
-	    LayoutInflater inflater = this.getLayoutInflater();
+		LayoutInflater inflater = this.getLayoutInflater();
         builder.setView(inflater.inflate(R.layout.loading_dialog,null));
         loadingDialog = builder.create();*/
 //        loadingDialog.setCanceledOnTouchOutside(false);
@@ -151,7 +162,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 				return row;
 			}
 
-        };
+		};
 //        simpleAdapter = new InteractiveSimpleAdapter(this, arrayList, R.layout.row, new String[]{ITEM_KEY}, new int[]{R.id.list_value},socialWifi,this);
 
 /*        File file = new File(getFilesDir(), "server.xml");
@@ -165,6 +176,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 //        wifies=socialWifi.ReadFromXML("pass.xml");
 
 		broadcastReceiver = new
+
 				BroadcastReceiver() {
 					@Override
 					public void onReceive(Context context, Intent intent) {
@@ -179,6 +191,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 	public void update() {
 		List<ScanResult> results = socialWifi.getWifi().getScanResults();
 		int size = results.size();
+		boolean containsFlag = false;
 		for (WifiPass wifi : socialWifi.getWifies()) {
 			Log.d(TAG, "Update: " + wifi.getSsid() + " " + wifi.getPassword() + " " + wifi.getBssid());
 		}
@@ -187,16 +200,25 @@ public class MainActivity extends Activity implements View.OnClickListener {
 		try {
 			size = size - 1;
 			while (size >= 0) {
+				containsFlag = false;
 				HashMap<String, String> item = new HashMap<String, String>();
 				item.put(ITEM_KEY, results.get(size).SSID);
 				item.put(EXTRAS_KEY, results.get(size).capabilities + "\n" + results.get(size).level);
 				item.put(BSSID_KEY, results.get(size).BSSID);
 				item.put(EXISTS_KEY, "n");
-				arrayList.add(item);
+				for (int i = 0; i < arrayList.size() - 1; i++) {
+					if (arrayList.get(i).containsValue(item.get(ITEM_KEY))) {
+						Log.d(TAG, "Same SSID: " + item.get(ITEM_KEY));
+						containsFlag = true;
+					}
+				}
 				size--;
+				if (containsFlag) continue;
+				arrayList.add(item);
 				for (WifiPass wifi : socialWifi.getWifies()) {
 					if (item.get(BSSID_KEY).contains(wifi.getBssid())) {
 						item.put(EXISTS_KEY, "y");
+						//todo Check ssid
 					}
 				}
 			}
@@ -219,6 +241,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
 				startActivity(new Intent(this, PrefsActivity.class));
 				break;
 			case R.id.list_value:
+				break;
+			case R.id.logout:
+				socialWifi.logout();
+				Intent intent = new Intent(this, LoginActivity.class);
+				startActivityForResult(intent, 1);
 				break;
 		}
 		return true;
@@ -247,78 +274,90 @@ public class MainActivity extends Activity implements View.OnClickListener {
 				clickedWifi = (HashMap<String, String>) simpleAdapter.getItem((Integer) v.getTag());
 				if (clickedWifi.get(EXISTS_KEY).equals("y")) {
 					Toast.makeText(this, "Error button clicked...\n" + clickedWifi.get(ITEM_KEY), Toast.LENGTH_SHORT).show();
-                    reportNewPassword();
+					reportNewPassword();
 				} else {
 					Toast.makeText(this, "Upload button clicked...\n" + clickedWifi.get(ITEM_KEY), Toast.LENGTH_SHORT).show();
-                    uploadPassword();
+					uploadPassword();
 				}
-                break;
-            case (R.id.list_value):
-                clickedWifi = (HashMap<String, String>) simpleAdapter.getItem((Integer) v.getTag());
-                connectWithPassword();
-                break;
-            default:
-                break;
-        }
-    }
+				break;
+			case (R.id.list_value):
+				clickedWifi = (HashMap<String, String>) simpleAdapter.getItem((Integer) v.getTag());
+				connectWithPassword();
+				break;
+			default:
+				break;
+		}
+	}
 
-    /**
-     * Using the credentials provided by the server, attempt to connect to the selected network.
-     */
-    public void connectWithPassword() {
-        int typeOfEncryption = 0;
-        String extraInfo = clickedWifi.get(EXTRAS_KEY);
-        String ssid = clickedWifi.get(ITEM_KEY);
-        String bssid = clickedWifi.get(BSSID_KEY);
-        String password = null;
-        for (WifiPass wifiPass : socialWifi.getWifies()){
-            if (wifiPass.getSsid().equals(ssid)){
-                if (wifiPass.getBssid().equals(bssid)){
-                    password = wifiPass.getPassword();
-                }
-            }
-        }
-        if (extraInfo.contains("WEP")) typeOfEncryption = 1;
-        else if (extraInfo.contains("WPA2")) typeOfEncryption = 3;
-        else if (extraInfo.contains("WAP")) typeOfEncryption = 2;
-        socialWifi.removeNetwork(ssid);
-        socialWifi.connect(ssid, password, typeOfEncryption);
+	/**
+	 * Using the credentials provided by the server, attempt to connect to the selected network.
+	 */
+	public void connectWithPassword() {
+		int typeOfEncryption = 0;
+		String extraInfo = clickedWifi.get(EXTRAS_KEY);
+		String ssid = clickedWifi.get(ITEM_KEY);
+		String bssid = clickedWifi.get(BSSID_KEY);
+		String password = null;
+		for (WifiPass wifiPass : socialWifi.getWifies()) {
+			if (wifiPass.getSsid().equals(ssid)) {
+				if (wifiPass.getBssid().equals(bssid)) {
+					password = wifiPass.getPassword();
+				}
+			}
+		}
+		if (extraInfo.contains("WEP")) typeOfEncryption = 1;
+		else if (extraInfo.contains("WPA2")) typeOfEncryption = 3;
+		else if (extraInfo.contains("WAP")) typeOfEncryption = 2;
+		socialWifi.removeNetwork(ssid);
+		socialWifi.connect(ssid, password, typeOfEncryption);
 //                Toast.makeText(this, "Selected...\n" + clickedWifi.get(ITEM_KEY), Toast.LENGTH_SHORT).show();
-    }
+	}
 
-    /**
-     * Open a dialog to input the password and upload the password to the server.
-     */
-    public void uploadPassword() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = this.getLayoutInflater();
-        final View view = inflater.inflate(R.layout.upload_dialog, null);
-        builder.setView(view)
-                .setPositiveButton(R.string.uploadPassword, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        EditText password = (EditText) view.findViewById(R.id.dialog_password);
-                        socialWifi.getLocation();
-                        UploadToServer uploadToServer = new UploadToServer(clickedWifi.get(ITEM_KEY), clickedWifi.get(BSSID_KEY), password.getText().toString(), context, socialWifi, clickedWifi.get(EXTRAS_KEY));
-                        uploadToServer.execute();
-                        dialog.dismiss();
-                    }
-                })
-                .setNegativeButton(R.string.cancelUploadPassword, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.dismiss();
-                    }
-                });
-        TextView ssid = (TextView) view.findViewById(R.id.dialog_ssid);
-        ssid.setText(clickedWifi.get(ITEM_KEY));
-        Dialog uploadDialog = builder.create();
-        uploadDialog.show();
-    }
+	/**
+	 * Open a dialog to input the password and upload the password to the server.
+	 */
+	public void uploadPassword() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		LayoutInflater inflater = this.getLayoutInflater();
+		final View view = inflater.inflate(R.layout.upload_dialog, null);
+		showPasswordCB = (CheckBox) view.findViewById(R.id.show_password);
+		showPasswordCB.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+				EditText password = (EditText) view.findViewById(R.id.dialog_password);
+				if (b) {
+					password.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+				} else {
+					password.setInputType(129);
+				}
+			}
+		});
+		builder.setView(view)
+				.setPositiveButton(R.string.uploadPassword, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int id) {
+						EditText password = (EditText) view.findViewById(R.id.dialog_password);
+						socialWifi.getLocation();
+						UploadToServer uploadToServer = new UploadToServer(clickedWifi.get(ITEM_KEY), clickedWifi.get(BSSID_KEY), password.getText().toString(), context, socialWifi, clickedWifi.get(EXTRAS_KEY));
+						uploadToServer.execute();
+						dialog.dismiss();
+					}
+				})
+				.setNegativeButton(R.string.cancelUploadPassword, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.dismiss();
+					}
+				});
+		TextView ssid = (TextView) view.findViewById(R.id.dialog_ssid);
+		ssid.setText(clickedWifi.get(ITEM_KEY));
+		Dialog uploadDialog = builder.create();
+		uploadDialog.show();
+	}
 
-    /**
-     * Send the new, corrected password to the server, considering current password is not working.
-     */
-    public void reportNewPassword() {
-        //todo update the server with new credentials for this network
-    }
+	/**
+	 * Send the new, corrected password to the server, considering current password is not working.
+	 */
+	public void reportNewPassword() {
+		//todo update the server with new credentials for this network
+	}
 }

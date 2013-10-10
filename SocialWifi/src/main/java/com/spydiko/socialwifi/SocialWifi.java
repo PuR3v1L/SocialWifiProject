@@ -347,10 +347,14 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
     public String getSharedPreferenceString (String pref) {
         return prefs.getString(pref,"");
     }
-	
-    private class MyLocationListener implements LocationListener {
 
-        public void onLocationChanged(Location location) {
+	public void logout() {
+		setSharedPreferenceBoolean("notFirstTime", false);
+	}
+
+	private class MyLocationListener implements LocationListener {
+
+		public void onLocationChanged(Location location) {
             location_now = new double[2];
             String message = String.format(
                     "New Location Longitude: %1$s Latitude: %2$s Time: %3$s",
@@ -453,8 +457,8 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 		        conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
 		        break;
 	        case 2:
-		        Log.d(TAG, "WPA");
-                conf.preSharedKey = "\"" + networkPass + "\"";
+		        Log.d(TAG, "WPA/WPA");
+		        conf.preSharedKey = "\"" + networkPass + "\"";
                 break;
 	        case 3:
 		        Log.d(TAG, "WPA2");

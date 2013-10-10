@@ -15,6 +15,8 @@
     <string name="radius_pref_title">Area of interest</string>
     <string name="titlePrefs">Preferences</string>
     <string name="area_radius_sum">Set the area you want to download. Now set to:</string>
+    <string name="logout">Logout</string>
+    <string name="show_password">Show password</string>
 
 
 </resources>

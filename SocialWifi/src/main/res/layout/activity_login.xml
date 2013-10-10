@@ -53,6 +53,14 @@
                 android:imeActionLabel="@string/action_sign_in_short"
                 android:imeActionId="@+id/login"
                 android:imeOptions="actionUnspecified" />
+
+            <CheckBox
+                    android:id="@+id/show_password_login"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="@string/show_password"
+                    android:layout_gravity="right"/>
+
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="match_parent"

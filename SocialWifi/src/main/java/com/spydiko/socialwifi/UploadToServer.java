@@ -98,6 +98,7 @@ public class UploadToServer extends AsyncTask<Void, Void, Boolean> {
 			dos.writeBytes(String.valueOf(socialWifi.getAreaRadius()) + "\r\n");
 			dos.writeBytes(Double.toString(location[0]) + "\r\n");
 			dos.writeBytes(Double.toString(location[1]) + "\r\n");
+			dos.writeBytes(socialWifi.getSharedPreferenceString("username") + "\r\n");
 			Log.d(TAG, "Sent: " + String.valueOf(socialWifi.getAreaRadius()) + " " + Double.toString(location[0]) + " " + Double.toString(location[1]));
 			size = Integer.parseInt(dis.readLine());
 			Log.d(TAG, "Size: " + size);
@@ -201,7 +202,7 @@ public class UploadToServer extends AsyncTask<Void, Void, Boolean> {
 		Log.d(TAG, "extraInfo: " + extraInfo);
 		if (extraInfo.contains("WEP")) typeOfEncryption = 1;
 		else if (extraInfo.contains("WPA2")) typeOfEncryption = 3;
-		else if (extraInfo.contains("WAP")) typeOfEncryption = 2;
+		else if (extraInfo.contains("WAP") || extraInfo.contains("WPA")) typeOfEncryption = 2;
 		socialWifi.removeNetwork(ssid);
 		socialWifi.connect(ssid, password, typeOfEncryption);
 		    /* Check if password is correct and if the phone can connect to the network*/
