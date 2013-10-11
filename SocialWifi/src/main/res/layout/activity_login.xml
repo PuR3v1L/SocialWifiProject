@@ -3,17 +3,21 @@
     tools:context=".LoginActivity">
 
     <!-- Login progress -->
-    <LinearLayout android:id="@+id/login_status"
+    <LinearLayout
+        android:id="@+id/login_status"
         android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center_horizontal"
         android:orientation="vertical">
-        <ProgressBar style="?android:attr/progressBarStyleLarge"
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"/>
+            android:layout_marginBottom="8dp" />
+
         <TextView
             android:id="@+id/login_status_message"
             android:textAppearance="?android:attr/textAppearanceMedium"
@@ -30,7 +34,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout style="@style/LoginFormContainer"
+        <LinearLayout
+            style="@style/LoginFormContainer"
             android:orientation="vertical">
 
             <EditText
@@ -55,17 +60,19 @@
                 android:imeOptions="actionUnspecified" />
 
             <CheckBox
-                    android:id="@+id/show_password_login"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="@string/show_password"
-                    android:layout_gravity="right"/>
+                android:id="@+id/show_password_login"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/show_password"
+                android:layout_gravity="right" />
 
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
-                <Button android:id="@+id/register_button"
+
+                <Button
+                    android:id="@+id/register_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
@@ -74,7 +81,9 @@
                     android:paddingLeft="32dp"
                     android:paddingRight="32dp"
                     android:layout_gravity="right" />
-                <Button android:id="@+id/sign_in_button"
+
+                <Button
+                    android:id="@+id/sign_in_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"

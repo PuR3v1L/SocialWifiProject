@@ -3,10 +3,10 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="@string/localization_prefs">
         <ListPreference
-                android:key="area_radius_list"
-                android:title="@string/radius_pref_title"
-                android:entries="@array/radius_list"
-                android:entryValues="@array/radius_list_values"
-                android:defaultValue="3"/>
+            android:key="area_radius_list"
+            android:title="@string/radius_pref_title"
+            android:entries="@array/radius_list"
+            android:entryValues="@array/radius_list_values"
+            android:defaultValue="3" />
     </PreferenceCategory>
 </PreferenceScreen>

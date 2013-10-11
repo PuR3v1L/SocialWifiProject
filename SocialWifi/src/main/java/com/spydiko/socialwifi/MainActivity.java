@@ -118,16 +118,16 @@ public class MainActivity extends Activity implements View.OnClickListener {
 		buttonScan.setOnClickListener(this);
 		context = this;
 
-//		if (!socialWifi.getSharedPreferenceString("username").equals("")) {
-//			Toast.makeText(this, "Welcome " + socialWifi.getSharedPreferenceString("username"), Toast.LENGTH_LONG).show();
-//		}
+		//		if (!socialWifi.getSharedPreferenceString("username").equals("")) {
+		//			Toast.makeText(this, "Welcome " + socialWifi.getSharedPreferenceString("username"), Toast.LENGTH_LONG).show();
+		//		}
 
 		usernameTextView.setText(socialWifi.getSharedPreferenceString("username") + " ");
 		/* AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		LayoutInflater inflater = this.getLayoutInflater();
         builder.setView(inflater.inflate(R.layout.loading_dialog,null));
         loadingDialog = builder.create();*/
-//        loadingDialog.setCanceledOnTouchOutside(false);
+		//        loadingDialog.setCanceledOnTouchOutside(false);
 		// ----------- Read all the saved wifi --------------
 		File file = new File(getFilesDir(), "local.xml");
 		if (file.exists()) {
@@ -163,7 +163,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 			}
 
 		};
-//        simpleAdapter = new InteractiveSimpleAdapter(this, arrayList, R.layout.row, new String[]{ITEM_KEY}, new int[]{R.id.list_value},socialWifi,this);
+		//        simpleAdapter = new InteractiveSimpleAdapter(this, arrayList, R.layout.row, new String[]{ITEM_KEY}, new int[]{R.id.list_value},socialWifi,this);
 
 /*        File file = new File(getFilesDir(), "server.xml");
         if (file.exists()) {
@@ -173,7 +173,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 //            Log.d(TAG,"doesn't exist");
         }*/
 
-//        wifies=socialWifi.ReadFromXML("pass.xml");
+		//        wifies=socialWifi.ReadFromXML("pass.xml");
 
 		broadcastReceiver = new
 
@@ -195,7 +195,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 		for (WifiPass wifi : socialWifi.getWifies()) {
 			Log.d(TAG, "Update: " + wifi.getSsid() + " " + wifi.getPassword() + " " + wifi.getBssid());
 		}
-//        Log.d(TAG, "the size is " + size);
+		//        Log.d(TAG, "the size is " + size);
 		arrayList.clear();
 		try {
 			size = size - 1;
@@ -224,7 +224,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 			}
 			Collections.sort(arrayList, new SortByExist());
 			simpleAdapter.notifyDataSetChanged();
-//            lv.setAdapter(simpleAdapter);
+			//            lv.setAdapter(simpleAdapter);
 		} catch (Exception e) {
 		}
 	}
@@ -268,7 +268,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 		switch (v.getId()) {
 			case (R.id.buttonScan):
 				socialWifi.getWifi().startScan();
-//                Log.d(TAG, "wifi start scan");
+				//                Log.d(TAG, "wifi start scan");
 				break;
 			case (R.id.right):
 				clickedWifi = (HashMap<String, String>) simpleAdapter.getItem((Integer) v.getTag());
@@ -310,7 +310,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 		else if (extraInfo.contains("WAP")) typeOfEncryption = 2;
 		socialWifi.removeNetwork(ssid);
 		socialWifi.connect(ssid, password, typeOfEncryption);
-//                Toast.makeText(this, "Selected...\n" + clickedWifi.get(ITEM_KEY), Toast.LENGTH_SHORT).show();
+		//                Toast.makeText(this, "Selected...\n" + clickedWifi.get(ITEM_KEY), Toast.LENGTH_SHORT).show();
 	}
 
 	/**
