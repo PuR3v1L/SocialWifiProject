@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
@@ -32,7 +33,7 @@ public class UploadToServer extends AsyncTask<Void, Void, Integer> {
 	private int serverPort = 44444;
 	private Dialog loadingDialog;
 	private int size;
-	private boolean add;
+	private boolean add, report, refresh;
 	private String ssid, bssid, password;
 	private byte[] buffer;
 	private SocialWifi socialWifi;
@@ -41,14 +42,17 @@ public class UploadToServer extends AsyncTask<Void, Void, Integer> {
 	private WifiManager wifi;
 	private boolean failureToConnect;
 	private String extraInfo;
-	private boolean failureToLocate;
+	private boolean notUser;
 	private String response;
 
 	public UploadToServer(Context context, SocialWifi socialWifi) {
 		super();
 		this.socialWifi = socialWifi;
 		this.context = context;
+		this.notUser = false;
 		add = false;
+		report = false;
+		refresh = true;
 	}
 
 	public UploadToServer(String ssid, String bssid, String password, Context context, SocialWifi socialWifi, String extraInfo) {
@@ -59,7 +63,23 @@ public class UploadToServer extends AsyncTask<Void, Void, Integer> {
 		this.socialWifi = socialWifi;
 		this.context = context;
 		this.extraInfo = extraInfo;
+		this.notUser = false;
 		add = true;
+		report = false;
+		refresh = false;
+	}
+
+	public UploadToServer(String ssid, String bssid, String password, Context context, SocialWifi socialWifi, String extraInfo, boolean b) {
+		add = false;
+		report = true;
+		refresh = false;
+		this.notUser = false;
+		this.ssid = ssid;
+		this.bssid = bssid;
+		this.password = password;
+		this.socialWifi = socialWifi;
+		this.context = context;
+		this.extraInfo = extraInfo;
 	}
 
 	/**
@@ -72,20 +92,51 @@ public class UploadToServer extends AsyncTask<Void, Void, Integer> {
 	@Override
 	protected Integer doInBackground(Void... params) {
 
-		if (add) {
+		if (add || report) {
 			if (!tryToConnect()) return 0;
 		}
-		if (!tryToLocalize()) return -1;
+		if (add || refresh) {
+			if (!tryToLocalize()) return -1;
 
+		}
 
 		if (!tryToOpenSocket()) return -2;
+
 		if (add) {
 			if (!tryToAdd()) return -3;
-		} else {
+		} else if (refresh) {
 			if (!tryToUpdate()) return -4;
+		} else if (report) {
+			if (!tryToReport()) return -5;
 		}
 
 		return 1;
+	}
+
+	private boolean tryToReport() {
+		try {
+			dos.writeBytes("changePass" + "\r\n");
+			Log.d(TAG, ssid);
+			dos.writeBytes(ssid + "\r\n");
+			Log.d(TAG, bssid);
+			dos.writeBytes(bssid + "\r\n");
+			Log.d(TAG, password);
+			dos.writeBytes(password + "\r\n");
+			Log.d(TAG, socialWifi.getSharedPreferenceString("username"));
+			dos.writeBytes(socialWifi.getSharedPreferenceString("username") + "\r\n");
+			Log.d(TAG, "Password report sent");
+			response = dis.readLine();
+			if (response.equals("Done")) return true;
+			else if (response.contains("notUser")) {
+				socialWifi.logout();
+				notUser = true;
+				return true;
+			} else return false;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+
 	}
 
 	/**
@@ -100,14 +151,28 @@ public class UploadToServer extends AsyncTask<Void, Void, Integer> {
 			dos.writeBytes(Double.toString(location[0]) + "\r\n");
 			dos.writeBytes(Double.toString(location[1]) + "\r\n");
 			dos.writeBytes(socialWifi.getSharedPreferenceString("username") + "\r\n");
-			Log.d(TAG, "Sent: " + String.valueOf(socialWifi.getAreaRadius()) + " " + Double.toString(location[0]) + " " + Double.toString(location[1]));
-			size = Integer.parseInt(dis.readLine());
-			Log.d(TAG, "Size: " + size);
-			buffer = new byte[size];
-			Log.d(TAG, "Buffer socket: " + sk.getReceiveBufferSize());
-			sk.setReceiveBufferSize(size);
-			dis.read(buffer);
-			Log.d(TAG, "Messages sent");
+			Log.d(TAG, "Sent: " + String.valueOf(socialWifi.getAreaRadius()) + " " + Double.toString(location[0]) + " " + Double.toString(location[1]) + " " + socialWifi.getSharedPreferenceString("username"));
+			String inputMsg = dis.readLine();
+			Log.d(TAG, "inputMsg: " + inputMsg);
+			try {
+				size = Integer.parseInt(inputMsg);
+				Log.d(TAG, "Size: " + size);
+				buffer = new byte[size];
+				Log.d(TAG, "Buffer socket: " + sk.getReceiveBufferSize());
+				sk.setReceiveBufferSize(size);
+				dis.read(buffer);
+			} catch (NumberFormatException e) {
+				Log.d(TAG, "Not User");
+				e.printStackTrace();
+				socialWifi.logout();
+				notUser = true;
+				return true;
+			} catch (IOException e) {
+				e.printStackTrace();
+				return false;
+			}
+
+			Log.d(TAG, "Messages Received");
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -116,7 +181,7 @@ public class UploadToServer extends AsyncTask<Void, Void, Integer> {
 	}
 
 	/**
-	 * This function tries to send to server a new WiFi SSID-BSSIS and password. It also stores the username of the uploader.
+	 * This function tries to send to server a new WiFi SSID-BSSID and password. It also stores the username of the uploader.
 	 *
 	 * @return true if successful, false otherwise.
 	 */
@@ -137,8 +202,13 @@ public class UploadToServer extends AsyncTask<Void, Void, Integer> {
 			dos.writeBytes(socialWifi.getSharedPreferenceString("username") + "\r\n");
 			Log.d(TAG, "Password add sent");
 			response = dis.readLine();
+			Log.d(TAG, "Response " + response);
 			if (response.equals("Done")) return true;
-			else return false;
+			else if (response.contains("notUser")) {
+				socialWifi.logout();
+				notUser = true;
+				return true;
+			} else return false;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
@@ -177,7 +247,7 @@ public class UploadToServer extends AsyncTask<Void, Void, Integer> {
 	 */
 	private boolean tryToLocalize() {
 		long current = System.currentTimeMillis();
-	      /* Get current location through wifi*/
+		/* Get current location through wifi*/
 		while (!socialWifi.isGotLocation() && System.currentTimeMillis() - current < 10000) {
 			try {
 				Thread.sleep(300);
@@ -205,7 +275,7 @@ public class UploadToServer extends AsyncTask<Void, Void, Integer> {
 		else if (extraInfo.contains("WAP") || extraInfo.contains("WPA")) typeOfEncryption = 2;
 		socialWifi.removeNetwork(ssid);
 		socialWifi.connect(ssid, password, typeOfEncryption);
-            /* Check if password is correct and if the phone can connect to the network*/
+		/* Check if password is correct and if the phone can connect to the network*/
 		long current = System.currentTimeMillis();
 		NetworkInfo networkInfo;
 		boolean ok = false;
@@ -261,20 +331,47 @@ public class UploadToServer extends AsyncTask<Void, Void, Integer> {
 		} else {
 			Log.d(TAG, "onPostExecute");
 			if (add) {
+				if (notUser) {
+					Toast.makeText(context, "NOT VALID USER...Logged out", Toast.LENGTH_SHORT).show();
+					loadingDialog.dismiss();
+					return;
+				} else {
+					Toast.makeText(context, "Success!\nNew password stored!", Toast.LENGTH_SHORT).show();
+				}
 				ArrayList<WifiPass> tmp = socialWifi.getWifies();
 				ArrayList<Double> loc = new ArrayList<Double>();
 				loc.add(0, location[0]);
 				loc.add(1, location[1]);
 				tmp.add(new WifiPass(ssid, bssid, password, loc));
 				socialWifi.setWifies(tmp);
-				Toast.makeText(context, "Success!\nNew password stored!", Toast.LENGTH_SHORT).show();
-			} else {
+			} else if (refresh) {
 				if (buffer != null) {
+					if (notUser) {
+						Toast.makeText(context, "NOT VALID USER...Logged out", Toast.LENGTH_SHORT).show();
+						loadingDialog.dismiss();
+						return;
+					} else {
+						Toast.makeText(context, "Success!\nUpdate worked!", Toast.LENGTH_SHORT).show();
+					}
 					socialWifi.storeXML(buffer);
 					socialWifi.setWifies(socialWifi.readFromXML("server.xml"));
-					Toast.makeText(context, "Success!\nUpdate worked!", Toast.LENGTH_SHORT).show();
 				} else {
 					Toast.makeText(context, "Error updating...\nTry again later...", Toast.LENGTH_SHORT).show();
+				}
+			} else if (report) {
+				if (notUser) {
+					Toast.makeText(context, "NOT VALID USER...Logged out", Toast.LENGTH_SHORT).show();
+					loadingDialog.dismiss();
+					return;
+				} else {
+					Toast.makeText(context, "Success!\nReport worked!", Toast.LENGTH_SHORT).show();
+				}
+				ArrayList<WifiPass> tmp = socialWifi.getWifies();
+				for (WifiPass wifi : socialWifi.getWifies()) {
+					if (wifi.getBssid() == bssid) {
+						wifi.setPassword(password);
+						Log.d(TAG, "password changed to " + password);
+					}
 				}
 			}
 			socialWifi.getWifi().startScan();

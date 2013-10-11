@@ -465,14 +465,14 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 			case 3:
 				Log.d(TAG, "WPA2");
 				conf.preSharedKey = quoteNonHex(networkPass, 64);
+				conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
+				conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
+				conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
 				break;
 			default:
 				break;
 		}
 		conf.status = WifiConfiguration.Status.ENABLED;
-		conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
-		conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
-		conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
 		conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
 		conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
 		conf.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
