@@ -17,13 +17,14 @@ android {
     buildToolsVersion "17.0.0"
 
     defaultConfig {
-        minSdkVersion 7
+        minSdkVersion 8
         targetSdkVersion 18
     }
 }
 
 dependencies {
     compile 'com.android.support:support-v4:18.0.0'
+    compile 'com.google.android.gms:play-services:3.2.65'
     compile fileTree(dir: 'libs', include: '*.jar')
 }
 

@@ -17,6 +17,8 @@
     <string name="area_radius_sum">Set the area you want to download. Now set to:</string>
     <string name="logout">Logout</string>
     <string name="show_password">Show password</string>
+    <string name="title_map_activity">Map</string>
+    <string name="map_pref">Show Map</string>
 
 
 </resources>

@@ -251,7 +251,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
 			case R.id.preferences:
 				startActivity(new Intent(this, PrefsActivity.class));
 				break;
-			case R.id.list_value:
+			case R.id.map_pref:
+				startActivity(new Intent(this, Map.class));
 				break;
 			case R.id.logout:
 				socialWifi.logout();

@@ -10,4 +10,7 @@
     <item
         android:id="@+id/logout"
         android:title="@string/logout" />
+    <item
+        android:id="@+id/map_pref"
+        android:title="@string/map_pref"/>
 </menu>
