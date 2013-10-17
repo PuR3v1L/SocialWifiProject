@@ -7,6 +7,7 @@ import android.widget.Toast;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -20,6 +21,8 @@ public class Map extends Activity {
 	private GoogleMap googleMap;
 	private SocialWifi socialWifi;
 	private ArrayList<WifiPass> wifies;
+	private int strokeColor = 0xff00c70f; //red outline
+	private int shadeColor = 0x4400c70f; //opaque red fill
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +43,8 @@ public class Map extends Activity {
 	 * function to load map. If map is not created it will create it for you
 	 */
 	private void initilizeMap() {
+
+
 		if (googleMap == null) {
 			googleMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
 
@@ -56,6 +61,23 @@ public class Map extends Activity {
 			// create marker
 			MarkerOptions marker = new MarkerOptions().position(new LatLng(wifi.getGeo().get(0), wifi.getGeo().get(1))).title(wifi.getSsid());
 			marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+			// adding marker
+			googleMap.addMarker(marker);
+		}
+
+		wifies = socialWifi.readFromXML("local.xml");
+		for (WifiPass wifi : wifies) {
+			// create marker
+			MarkerOptions marker = new MarkerOptions().position(new LatLng(wifi.getGeo().get(0), wifi.getGeo().get(1))).title(wifi.getSsid());
+			marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+
+			googleMap.addCircle(new CircleOptions()
+					.center(new LatLng(wifi.getGeo().get(0), wifi.getGeo().get(1)))
+					.radius(25)
+					.strokeColor(strokeColor)
+					.fillColor(shadeColor));
+
+
 			// adding marker
 			googleMap.addMarker(marker);
 		}
