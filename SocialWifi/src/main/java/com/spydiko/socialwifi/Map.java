@@ -6,8 +6,11 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.ArrayList;
 
 /**
  * Created by spiros on 10/15/13.
@@ -15,12 +18,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class Map extends Activity {
 	// Google Map
 	private GoogleMap googleMap;
+	private SocialWifi socialWifi;
+	private ArrayList<WifiPass> wifies;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.map_layout);
-
+		socialWifi = (SocialWifi) getApplication();
 		try {
 			// Loading map
 			initilizeMap();
@@ -45,13 +50,15 @@ public class Map extends Activity {
 						.show();
 			}
 		}
+		wifies = socialWifi.readFromXMLPython("mine.xml");
 
-		// create marker
-		MarkerOptions marker = new MarkerOptions().position(new LatLng(40.6253908, 22.9622492)).title("Geia sou Thalia");
-
-		// adding marker
-		googleMap.addMarker(marker);
-
+		for (WifiPass wifi : wifies) {
+			// create marker
+			MarkerOptions marker = new MarkerOptions().position(new LatLng(wifi.getGeo().get(0), wifi.getGeo().get(1))).title(wifi.getSsid());
+			marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+			// adding marker
+			googleMap.addMarker(marker);
+		}
 		googleMap.setMyLocationEnabled(true); // false to disable
 
 		googleMap.getUiSettings().setMyLocationButtonEnabled(true);
