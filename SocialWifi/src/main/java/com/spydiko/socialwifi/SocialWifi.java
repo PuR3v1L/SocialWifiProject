@@ -295,20 +295,14 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 			data = new String(inputBuffer);
 			isr.close();
 			fis.close();
-		} catch (
-				FileNotFoundException e3
-				)
-
-		{
+		} catch (FileNotFoundException e3) {
 			// TODO Auto-generated catch block
 			e3.printStackTrace();
-		} catch (
-				IOException e
-				)
-
-		{
+			return null;
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return null;
 		}
 
 		XmlPullParserFactory factory = null;
