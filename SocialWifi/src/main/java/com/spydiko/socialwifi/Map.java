@@ -2,6 +2,7 @@ package com.spydiko.socialwifi;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -17,6 +18,8 @@ import java.util.ArrayList;
  * Created by spiros on 10/15/13.
  */
 public class Map extends Activity {
+
+	private static final String TAG = Map.class.getSimpleName();
 	// Google Map
 	private GoogleMap googleMap;
 	private SocialWifi socialWifi;
@@ -55,31 +58,42 @@ public class Map extends Activity {
 						.show();
 			}
 		}
-		wifies = socialWifi.readFromXMLPython("mine.xml");
 
-		for (WifiPass wifi : wifies) {
-			// create marker
-			MarkerOptions marker = new MarkerOptions().position(new LatLng(wifi.getGeo().get(0), wifi.getGeo().get(1))).title(wifi.getSsid());
-			marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
-			// adding marker
-			googleMap.addMarker(marker);
+		try {
+			wifies = socialWifi.readFromXMLPython("mine.xml");
+			for (WifiPass wifi : wifies) {
+				// create marker
+				MarkerOptions marker = new MarkerOptions().position(new LatLng(wifi.getGeo().get(0), wifi.getGeo().get(1))).title(wifi.getSsid());
+				marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+				// adding marker
+				googleMap.addMarker(marker);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.d(TAG, "mine.xml doesn't exist");
 		}
 
-		wifies = socialWifi.readFromXML("local.xml");
-		for (WifiPass wifi : wifies) {
-			// create marker
-			MarkerOptions marker = new MarkerOptions().position(new LatLng(wifi.getGeo().get(0), wifi.getGeo().get(1))).title(wifi.getSsid());
-			marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+		try {
+			wifies = socialWifi.readFromXML("local.xml");
+			for (WifiPass wifi : wifies) {
+				// create marker
+				MarkerOptions marker = new MarkerOptions().position(new LatLng(wifi.getGeo().get(0), wifi.getGeo().get(1))).title(wifi.getSsid());
+				marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
 
-			googleMap.addCircle(new CircleOptions()
-					.center(new LatLng(wifi.getGeo().get(0), wifi.getGeo().get(1)))
-					.radius(25)
-					.strokeColor(strokeColor)
-					.fillColor(shadeColor));
+				googleMap.addCircle(new CircleOptions()
+						.center(new LatLng(wifi.getGeo().get(0), wifi.getGeo().get(1)))
+						.radius(25)
+						.strokeColor(strokeColor)
+						.fillColor(shadeColor));
 
 
-			// adding marker
-			googleMap.addMarker(marker);
+				// adding marker
+				googleMap.addMarker(marker);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.d(TAG, "local.xml doesn't exist");
+
 		}
 		googleMap.setMyLocationEnabled(true); // false to disable
 

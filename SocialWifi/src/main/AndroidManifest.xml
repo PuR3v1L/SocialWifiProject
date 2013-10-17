@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.spydiko.socialwifi"
     android:versionCode="1"
-    android:versionName="alpha 0.0.6b">
+    android:versionName="alpha 0.0.8.1">
 
 
     <uses-sdk
@@ -70,6 +70,10 @@
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyCOTRMKZ3Yd-zDQJLS7nzHnDVA9ojhZOpQ"/>
+
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyDHxIlDIfuP5N5-TwNSwm5tF9d90-S2rLs"/>
     </application>
 
 </manifest>
