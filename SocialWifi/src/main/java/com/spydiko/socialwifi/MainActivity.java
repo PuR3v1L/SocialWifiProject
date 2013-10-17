@@ -45,7 +45,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 	private ArrayList<HashMap<String, String>> arrayList;
 	private HashMap<String, String> clickedWifi;
 	private ListView lv;
-	private String ITEM_KEY = "key", BSSID_KEY = "bssid", EXISTS_KEY = "exist", EXTRAS_KEY = "extra";
+	private String ITEM_KEY = "key", BSSID_KEY = "bssid", EXISTS_KEY = "exist", EXTRAS_KEY = "extra", IMAGE_KEY = "image", SIGNAL_KEY = "signal";
 	private BroadcastReceiver broadcastReceiver;
 	private FileOutputStream outputStream;
 	private Context context;
@@ -139,7 +139,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 		// --------------------------------------------------
 		arrayList = new ArrayList<HashMap<String, String>>();
 		lv = (ListView) findViewById(R.id.list_scan);
-		simpleAdapter = new SimpleAdapter(this, arrayList, R.layout.row, new String[]{ITEM_KEY}, new int[]{R.id.list_value}) {
+		simpleAdapter = new SimpleAdapter(this, arrayList, R.layout.row, new String[]{ITEM_KEY, IMAGE_KEY}, new int[]{R.id.list_value, R.id.signal}) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
 				View row = super.getView(position, convertView, parent);
@@ -203,6 +203,16 @@ public class MainActivity extends Activity implements View.OnClickListener {
 				containsFlag = false;
 				HashMap<String, String> item = new HashMap<String, String>();
 				item.put(ITEM_KEY, results.get(size).SSID);
+				Log.d(TAG, "level (db) of " + results.get(size).SSID + " :" + results.get(size).level);
+				item.put(SIGNAL_KEY, Integer.toString(results.get(size).level));
+				if (results.get(size).level > -60)
+					item.put(IMAGE_KEY, Integer.toString(R.drawable.wifi_full));
+				else if (results.get(size).level > -80)
+					item.put(IMAGE_KEY, Integer.toString(R.drawable.wifi_good));
+				else if (results.get(size).level > -90)
+					item.put(IMAGE_KEY, Integer.toString(R.drawable.wifi_weak));
+				else
+					item.put(IMAGE_KEY, Integer.toString(R.drawable.wifi_no_signal));
 				item.put(EXTRAS_KEY, results.get(size).capabilities + "\n" + results.get(size).level);
 				item.put(BSSID_KEY, results.get(size).BSSID);
 				item.put(EXISTS_KEY, "n");
@@ -222,6 +232,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 					}
 				}
 			}
+			Collections.sort(arrayList, new SortBySignalStrength());
 			Collections.sort(arrayList, new SortByExist());
 			simpleAdapter.notifyDataSetChanged();
 			//            lv.setAdapter(simpleAdapter);

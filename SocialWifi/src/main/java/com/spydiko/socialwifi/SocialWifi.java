@@ -280,6 +280,157 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 		return userData;
 	}
 
+	public ArrayList<WifiPass> readFromXMLPython(String xmlFile) {
+
+		ArrayList<WifiPass> userData = new ArrayList<WifiPass>();
+		FileInputStream fis;
+		InputStreamReader isr;
+		char[] inputBuffer;
+		String data = null;
+		try {
+			fis = this.openFileInput(xmlFile);
+			isr = new InputStreamReader(fis);
+			inputBuffer = new char[fis.available()];
+			isr.read(inputBuffer);
+			data = new String(inputBuffer);
+			isr.close();
+			fis.close();
+		} catch (
+				FileNotFoundException e3
+				)
+
+		{
+			// TODO Auto-generated catch block
+			e3.printStackTrace();
+		} catch (
+				IOException e
+				)
+
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		XmlPullParserFactory factory = null;
+		try
+
+		{
+			factory = XmlPullParserFactory.newInstance();
+		} catch (
+				XmlPullParserException e2
+				)
+
+		{
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+
+		factory.setNamespaceAware(true);
+		XmlPullParser xpp = null;
+		try
+
+		{
+			xpp = factory.newPullParser();
+		} catch (
+				XmlPullParserException e2
+				)
+
+		{
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+
+		try
+
+		{
+			xpp.setInput(new StringReader(data));
+		} catch (
+				XmlPullParserException e1
+				)
+
+		{
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		int eventType = 0;
+		try
+
+		{
+			eventType = xpp.getEventType();
+		} catch (
+				XmlPullParserException e1
+				)
+
+		{
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		WifiPass wifiPass;
+		String name = null;
+		int check = 0;
+		String password = null;
+		String ssid = null;
+		String bssid = null;
+		String latitude = null;
+		String longitude = null;
+		while (eventType != XmlPullParser.END_DOCUMENT)
+
+		{
+			if (eventType == XmlPullParser.START_DOCUMENT) {
+				//                System.out.println("Start document");
+			} else if (eventType == XmlPullParser.START_TAG) {
+				//                System.out.println("Start tag " + xpp.getName());
+				name = xpp.getName().concat("start");
+				if (xpp.getAttributeCount() > 0) {
+					//                    Log.d(TAG, xpp.getAttributeName(0));
+					if (xpp.getAttributeName(0).equals("method")) {
+						check = 1;
+					}
+				}
+			} else if (eventType == XmlPullParser.TEXT) {
+				//                Log.d(TAG, "Text: " + xpp.getText());
+				if (check == 1 && name.equals("doublestart")) {
+					latitude = xpp.getText();
+					//                    Log.d(TAG, "Lati: " + latitude);
+					check = 2;
+				} else if (check == 2 && name.equals("doublestart")) {
+					longitude = xpp.getText();
+					//                    Log.d(TAG, "Long: " + longitude);
+					check = 3;
+				} else if (check == 3 && name.equals("stringstart")) {
+					ssid = xpp.getText();
+					//                    Log.d(TAG, "ssid: " + ssid);
+					check = -1;
+				}
+			} else if (eventType == XmlPullParser.END_TAG) {
+				//                System.out.println("End tag " + xpp.getName());
+				name = xpp.getName().concat("end");
+				if (xpp.getName().equals("void") && check == -1) {
+					ArrayList<Double> temp = new ArrayList<Double>();
+					Double lat = Double.parseDouble(latitude);
+					Double lon = Double.parseDouble(longitude);
+					temp.add(lat);
+					temp.add(lon);
+					wifiPass = new WifiPass(ssid, "", "", temp);
+					userData.add(wifiPass);
+					check = 0;
+				}
+			}
+			try {
+				eventType = xpp.next();
+			} catch (XmlPullParserException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return userData;
+	}
+
 	public void getLocation() {
 		lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
@@ -461,6 +612,9 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 			case 2:
 				Log.d(TAG, "WPA/WPA");
 				conf.preSharedKey = "\"" + networkPass + "\"";
+				conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
+				conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
+				conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
 				break;
 			case 3:
 				Log.d(TAG, "WPA2");
