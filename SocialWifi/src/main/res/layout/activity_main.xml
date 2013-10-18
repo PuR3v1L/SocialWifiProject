@@ -1,20 +1,20 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".MainActivity">
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/activity_vertical_margin"
+                tools:context=".MainActivity">
 
-    <Button
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:id="@+id/buttonScan"
-        android:textSize="20sp"
-        android:layout_marginRight="5dp"
-        android:text="@string/buttonUpdate" />
+    <!--<Button-->
+    <!--android:layout_width="fill_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentTop="true"-->
+    <!--android:id="@+id/buttonScan"-->
+    <!--android:textSize="20sp"-->
+    <!--android:layout_marginRight="5dp"-->
+    <!--android:text="@string/buttonUpdate" />-->
 
     <LinearLayout
         android:id="@+id/spydiko"
@@ -39,7 +39,7 @@
             android:text="@string/createdby"
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
-            android:id="@+id/textView" />
+            android:id="@+id/textView"/>
 
         <TextView
             android:layout_width="fill_parent"
@@ -51,21 +51,37 @@
             android:layout_weight="1"
             android:gravity="right"
             android:layout_gravity="center_vertical"
-            android:id="@+id/usernameTextView" />
+            android:id="@+id/usernameTextView"/>
 
     </LinearLayout>
 
-    <ListView
-        android:layout_width="match_parent"
-        android:fadingEdge="vertical"
-        android:requiresFadingEdge="vertical"
-        android:fadingEdgeLength="5dp"
-        android:layout_height="wrap_content"
-        android:scrollbars="vertical"
-        android:listSelector="@android:color/transparent"
-        android:background="@android:color/transparent"
-        android:layout_below="@id/buttonScan"
-        android:layout_above="@id/spydiko"
-        android:id="@+id/list_scan" />
+    <uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout
+        android:id="@+id/ptr_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@id/spydiko">
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:gravity="center"
+            android:text="@string/swipe_down_to_refresh"
+            android:id="@+id/swipe2refresh"
+            />
+
+        <ListView
+            android:layout_width="match_parent"
+            android:fadingEdge="vertical"
+            android:requiresFadingEdge="vertical"
+            android:fadingEdgeLength="5dp"
+            android:layout_height="fill_parent"
+            android:scrollbars="vertical"
+            android:listSelector="@android:color/transparent"
+            android:background="@android:color/transparent"
+
+            android:id="@+id/list_scan"/>
+
+    </uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout>
+
 
 </RelativeLayout>

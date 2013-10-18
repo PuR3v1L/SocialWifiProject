@@ -19,7 +19,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -36,11 +35,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-public class MainActivity extends Activity implements View.OnClickListener {
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
+
+public class MainActivity extends Activity implements View.OnClickListener, PullToRefreshAttacher.OnRefreshListener {
 
 	private final static String TAG = MainActivity.class.getSimpleName();
 	private SocialWifi socialWifi;
-	private Button buttonScan;
+	//	private Button buttonScan;
 	private SimpleAdapter simpleAdapter;
 	private ArrayList<HashMap<String, String>> arrayList;
 	private HashMap<String, String> clickedWifi;
@@ -49,8 +51,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
 	private BroadcastReceiver broadcastReceiver;
 	private FileOutputStream outputStream;
 	private Context context;
-	private TextView usernameTextView;
+	private TextView usernameTextView, swipe2Refresh;
 	private CheckBox showPasswordCB;
+	private PullToRefreshAttacher mPullToRefreshAttacher;
 
 	@Override
 	protected void onStop() {
@@ -110,12 +113,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
 		setContentView(R.layout.activity_main);
 		socialWifi = (SocialWifi) getApplication();
 		usernameTextView = (TextView) findViewById(R.id.usernameTextView);
+		swipe2Refresh = (TextView) findViewById(R.id.swipe2refresh);
 		if (!socialWifi.getSharedPreferenceBoolean("notFirstTime")) {
 			Intent intent = new Intent(this, LoginActivity.class);
 			startActivityForResult(intent, 1);
 		}
-		buttonScan = (Button) findViewById(R.id.buttonScan);
-		buttonScan.setOnClickListener(this);
+		//		buttonScan = (Button) findViewById(R.id.buttonScan);
+		//		buttonScan.setOnClickListener(this);
 		context = this;
 
 		//		if (!socialWifi.getSharedPreferenceString("username").equals("")) {
@@ -180,20 +184,39 @@ public class MainActivity extends Activity implements View.OnClickListener {
 				BroadcastReceiver() {
 					@Override
 					public void onReceive(Context context, Intent intent) {
+						swipe2Refresh.setVisibility(View.GONE);
 						update();
-						lv.setAdapter(simpleAdapter);
-						simpleAdapter.notifyDataSetChanged();
+						if (arrayList.size() == 0) {
+							Log.d(TAG, "No Wifi networks found...");
+							Toast.makeText(context, "No Wifi networks found...", Toast.LENGTH_LONG).show();
+							swipe2Refresh.setVisibility(View.VISIBLE);
+						} else {
+							lv.setAdapter(simpleAdapter);
+							simpleAdapter.notifyDataSetChanged();
+							mPullToRefreshAttacher.setRefreshComplete();
+						}
 					}
 				};
+
+		// Create a PullToRefreshAttacher instance
+		mPullToRefreshAttacher = PullToRefreshAttacher.get(this);
+
+		// Retrieve the PullToRefreshLayout from the content view
+		PullToRefreshLayout ptrLayout = (PullToRefreshLayout) findViewById(R.id.ptr_layout);
+
+		// Give the PullToRefreshAttacher to the PullToRefreshLayout, along with a refresh listener.
+		ptrLayout.setPullToRefreshAttacher(mPullToRefreshAttacher, this);
 
 	}
 
 	public void update() {
 		List<ScanResult> results = socialWifi.getWifi().getScanResults();
 		int size = results.size();
+
 		boolean containsFlag = false;
 		for (WifiPass wifi : socialWifi.getWifies()) {
 			Log.d(TAG, "Update: " + wifi.getSsid() + " " + wifi.getPassword() + " " + wifi.getBssid());
+
 		}
 		//        Log.d(TAG, "the size is " + size);
 		arrayList.clear();
@@ -278,10 +301,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
 		}
 
 		switch (v.getId()) {
-			case (R.id.buttonScan):
-				socialWifi.getWifi().startScan();
-				//                Log.d(TAG, "wifi start scan");
-				break;
+			//			case (R.id.buttonScan):
+			//				socialWifi.getWifi().startScan();
+			//                Log.d(TAG, "wifi start scan");
+			//				break;
 			case (R.id.right):
 				clickedWifi = (HashMap<String, String>) simpleAdapter.getItem((Integer) v.getTag());
 				if (clickedWifi.get(EXISTS_KEY).equals("y")) {
@@ -407,5 +430,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
 		Dialog uploadDialog = builder.create();
 		uploadDialog.show();
 
+	}
+
+	@Override
+	public void onRefreshStarted(View view) {
+		if (socialWifi.getWifi().isWifiEnabled() == false) {
+			Toast.makeText(getApplicationContext(), "wifi is disabled..making it enabled", Toast.LENGTH_LONG).show();
+			socialWifi.getWifi().setWifiEnabled(true);
+		}
+		socialWifi.getWifi().startScan();
 	}
 }

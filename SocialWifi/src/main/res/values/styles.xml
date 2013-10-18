@@ -16,6 +16,7 @@
     <!-- Application theme. -->
     <style name="AppTheme" parent="android:Theme.DeviceDefault">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+        <item name="ptrHeaderStyle">@style/Widget.Custom.PtrHeader</item>
     </style>
 
     <style name="CustomDialog" parent="android:Theme.Dialog">
@@ -31,6 +32,12 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:padding">16dp</item>
+    </style>
+
+    <style name="Widget.Custom.PtrHeader" parent="android:Widget">
+        <item name="ptrPullText">@string/pull2refresh</item>
+        <item name="ptrRefreshingText">@string/searching</item>
+        <item name="ptrReleaseText">@string/release</item>
     </style>
 
 </resources>

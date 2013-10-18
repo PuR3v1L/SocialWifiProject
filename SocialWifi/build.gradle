@@ -25,6 +25,7 @@ android {
 dependencies {
     compile 'com.android.support:support-v4:18.0.0'
     compile 'com.google.android.gms:play-services:3.2.65'
+    compile 'com.github.chrisbanes.actionbarpulltorefresh:library:0.8'
     compile fileTree(dir: 'libs', include: '*.jar')
 }
 
