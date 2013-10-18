@@ -24,8 +24,8 @@ public class Map extends Activity {
 	private GoogleMap googleMap;
 	private SocialWifi socialWifi;
 	private ArrayList<WifiPass> wifies;
-	private int strokeColor = 0xff00c70f; //red outline
-	private int shadeColor = 0x4400c70f; //opaque red fill
+	private int strokeColor = 0x0000c70f; //green outline
+	private int shadeColor = 0x4400c70f; //opaque green fill
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
