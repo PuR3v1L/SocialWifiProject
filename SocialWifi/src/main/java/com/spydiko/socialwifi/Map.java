@@ -100,6 +100,9 @@ public class Map extends Activity implements android.location.LocationListener {
 			Log.d(TAG, "local.xml doesn't exist");
 
 		}
+
+		googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+
 		googleMap.setMyLocationEnabled(true); // false to disable
 
 		googleMap.getUiSettings().setMyLocationButtonEnabled(true);
