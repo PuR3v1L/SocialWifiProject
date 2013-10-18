@@ -1,13 +1,18 @@
 package com.spydiko.socialwifi;
 
 import android.app.Activity;
+import android.content.Context;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -17,7 +22,7 @@ import java.util.ArrayList;
 /**
  * Created by spiros on 10/15/13.
  */
-public class Map extends Activity {
+public class Map extends Activity implements android.location.LocationListener {
 
 	private static final String TAG = Map.class.getSimpleName();
 	// Google Map
@@ -26,6 +31,7 @@ public class Map extends Activity {
 	private ArrayList<WifiPass> wifies;
 	private int strokeColor = 0x0000c70f; //green outline
 	private int shadeColor = 0x4400c70f; //opaque green fill
+	private LocationManager locationManager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +52,6 @@ public class Map extends Activity {
 	 * function to load map. If map is not created it will create it for you
 	 */
 	private void initilizeMap() {
-
 
 		if (googleMap == null) {
 			googleMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
@@ -99,11 +104,40 @@ public class Map extends Activity {
 
 		googleMap.getUiSettings().setMyLocationButtonEnabled(true);
 
+		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, this); //You can also use LocationManager.GPS_PROVIDER and LocationManager.PASSIVE_PROVIDER
+
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
 		initilizeMap();
+	}
+
+	@Override
+	public void onLocationChanged(Location location) {
+
+		CameraPosition cameraPosition = new CameraPosition.Builder().target(new LatLng(location.getLatitude(), location.getLongitude())).zoom(15).build();
+
+		googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+		locationManager.removeUpdates(this);
+
+	}
+
+	@Override
+	public void onStatusChanged(String s, int i, Bundle bundle) {
+
+	}
+
+	@Override
+	public void onProviderEnabled(String s) {
+
+	}
+
+	@Override
+	public void onProviderDisabled(String s) {
+
 	}
 }
