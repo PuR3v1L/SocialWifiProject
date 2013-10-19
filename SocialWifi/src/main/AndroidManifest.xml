@@ -67,9 +67,14 @@
             android:name="com.spydiko.socialwifi.Map"
             android:label="@string/title_map_activity"/>
         <!-- Goolge Maps API Key -->
+        <!--<meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyCOTRMKZ3Yd-zDQJLS7nzHnDVA9ojhZOpQ"/>-->
+
+        <!--Purevil-->
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyCOTRMKZ3Yd-zDQJLS7nzHnDVA9ojhZOpQ"/>
+            android:value="AIzaSyAkqSSMZk8BYwopiOaTQ420lqZ3hNWO6Fg"/>
 
         <!--<meta-data-->
             <!--android:name="com.google.android.maps.v2.API_KEY"-->
