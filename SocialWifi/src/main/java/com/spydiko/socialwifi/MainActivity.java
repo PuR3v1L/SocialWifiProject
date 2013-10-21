@@ -59,15 +59,15 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 	protected void onStop() {
 		super.onStop();
 		Log.d(TAG, "onStop");
-		try {
-			File file = new File(getFilesDir(), "server.xml");
-			boolean deleted = file.delete();
-			Log.d(TAG, "server deletion is " + deleted);
-			outputStream.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+//		try {
+//			File file = new File(getFilesDir(), "server.xml");
+//			boolean deleted = file.delete();
+//			Log.d(TAG, "server deletion is " + deleted);
+//			outputStream.close();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+    }
 
 	@Override
 	protected void onPause() {
@@ -226,8 +226,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 				containsFlag = false;
 				HashMap<String, String> item = new HashMap<String, String>();
 				item.put(ITEM_KEY, results.get(size).SSID);
-				Log.d(TAG, "level (db) of " + results.get(size).SSID + " :" + results.get(size).level);
-				item.put(SIGNAL_KEY, Integer.toString(results.get(size).level));
+//				Log.d(TAG, "level (db) of " + results.get(size).SSID + " :" + results.get(size).level);
+                item.put(SIGNAL_KEY, Integer.toString(results.get(size).level));
 				if (results.get(size).level > -60)
 					item.put(IMAGE_KEY, Integer.toString(R.drawable.wifi_full));
 				else if (results.get(size).level > -80)
@@ -241,8 +241,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 				item.put(EXISTS_KEY, "n");
 				for (int i = 0; i < arrayList.size(); i++) {
 					if (arrayList.get(i).containsValue(item.get(ITEM_KEY).trim())) {
-						Log.d(TAG, "Same SSID: " + item.get(ITEM_KEY));
-						containsFlag = true;
+//						Log.d(TAG, "Same SSID: " + item.get(ITEM_KEY));
+                        containsFlag = true;
 					}
 				}
 				size--;

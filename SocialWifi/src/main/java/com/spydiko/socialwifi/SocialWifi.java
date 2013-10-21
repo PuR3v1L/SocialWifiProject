@@ -21,6 +21,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 import org.xmlpull.v1.XmlSerializer;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -46,8 +47,8 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 	private SharedPreferences.Editor editor;
 	private WifiManager wifi;
 	private ConnectivityManager connectivityManager;
-	private FileOutputStream outputStream;
-	private OutputStreamWriter osw;
+    //	private FileOutputStream outputStream;
+    private OutputStreamWriter osw;
 	private ArrayList<WifiPass> wifies;
 	private double[] location_now;
 	private float areaRadius;
@@ -565,9 +566,18 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 	}
 
 	public void storeXML(byte[] buffer) {
-		try {
-			outputStream = openFileOutput("server.xml", Context.MODE_PRIVATE);
-			outputStream.write(buffer);
+        try {
+            File file = new File(getFilesDir(), "server.xml");
+            boolean deleted = file.delete();
+            Log.d(TAG, "server deletion is " + deleted);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            Log.d(TAG, "buffer to write: " + buffer.length);
+            FileOutputStream outputStream = openFileOutput("server.xml", Context.MODE_PRIVATE);
+            outputStream.write(buffer);
 			outputStream.close();
 		} catch (Exception e) {
 			e.printStackTrace();

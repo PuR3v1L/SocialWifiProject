@@ -160,8 +160,9 @@ public class UploadToServer extends AsyncTask<Void, Void, Integer> {
 				buffer = new byte[size];
 				Log.d(TAG, "Buffer socket: " + sk.getReceiveBufferSize());
 				sk.setReceiveBufferSize(size);
-				dis.read(buffer);
-			} catch (NumberFormatException e) {
+                dis.readFully(buffer, 0, buffer.length);
+                Log.d(TAG, "Buffer size: " + buffer.length);
+            } catch (NumberFormatException e) {
 				Log.d(TAG, "Not User");
 				e.printStackTrace();
 				socialWifi.logout();
