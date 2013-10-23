@@ -60,23 +60,24 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 	protected void onStop() {
 		super.onStop();
 		Log.d(TAG, "onStop");
-//		try {
-//			File file = new File(getFilesDir(), "server.xml");
-//			boolean deleted = file.delete();
-//			Log.d(TAG, "server deletion is " + deleted);
-//			outputStream.close();
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-    }
+		//		try {
+		//			File file = new File(getFilesDir(), "server.xml");
+		//			boolean deleted = file.delete();
+		//			Log.d(TAG, "server deletion is " + deleted);
+		//			outputStream.close();
+		//		} catch (Exception e) {
+		//			e.printStackTrace();
+		//		}
+	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
+		Log.d(TAG, "onPause");
 		try {
 			outputStream = openFileOutput("local.xml", Context.MODE_PRIVATE);
 			OutputStreamWriter osw = new OutputStreamWriter(outputStream);
-			outputStreamPy = openFileOutput("mine.xml",Context.MODE_PRIVATE);
+			outputStreamPy = openFileOutput("mine.xml", Context.MODE_PRIVATE);
 			OutputStreamWriter oswPy = new OutputStreamWriter(outputStreamPy);
 			socialWifi.createXMLString(osw, socialWifi.getWifies());
 			socialWifi.createXMLString(oswPy, socialWifi.getPyWifies());
@@ -86,7 +87,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 		}
 		unregisterReceiver(broadcastReceiver);
 		SocialWifi.editor.commit();
-		Log.d(TAG, "onPause");
+
 	}
 
 	@Override
@@ -132,7 +133,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 		//		}
 
 		usernameTextView.setText(socialWifi.getSharedPreferenceString("username") + " ");
-		/* AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		    /* AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		LayoutInflater inflater = this.getLayoutInflater();
         builder.setView(inflater.inflate(R.layout.loading_dialog,null));
         loadingDialog = builder.create();*/
@@ -141,7 +142,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 		File file = new File(getFilesDir(), "local.xml");
 		if (file.exists()) {
 			socialWifi.setWifies(socialWifi.readFromXML("local.xml"));
+
 			Log.d(TAG, "exists");
+		} else {
+			Log.d(TAG, "doesn't exist");
+		}
+		file = new File(getFilesDir(), "mine.xml");
+		if (file.exists()) {
+			socialWifi.setPyWifies(socialWifi.readFromXMLPython("mine.xml"));
 		} else {
 			Log.d(TAG, "doesn't exist");
 		}
@@ -231,8 +239,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 				containsFlag = false;
 				HashMap<String, String> item = new HashMap<String, String>();
 				item.put(ITEM_KEY, results.get(size).SSID);
-//				Log.d(TAG, "level (db) of " + results.get(size).SSID + " :" + results.get(size).level);
-                item.put(SIGNAL_KEY, Integer.toString(results.get(size).level));
+				//				Log.d(TAG, "level (db) of " + results.get(size).SSID + " :" + results.get(size).level);
+				item.put(SIGNAL_KEY, Integer.toString(results.get(size).level));
 				if (results.get(size).level > -60)
 					item.put(IMAGE_KEY, Integer.toString(R.drawable.wifi_full));
 				else if (results.get(size).level > -80)
@@ -246,8 +254,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 				item.put(EXISTS_KEY, "n");
 				for (int i = 0; i < arrayList.size(); i++) {
 					if (arrayList.get(i).containsValue(item.get(ITEM_KEY).trim())) {
-//						Log.d(TAG, "Same SSID: " + item.get(ITEM_KEY));
-                        containsFlag = true;
+						//						Log.d(TAG, "Same SSID: " + item.get(ITEM_KEY));
+						containsFlag = true;
 					}
 				}
 				size--;

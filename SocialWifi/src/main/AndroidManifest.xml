@@ -2,10 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.spydiko.socialwifi"
     android:versionCode="1"
-    android:versionName="alpha 0.0.10">
+    android:versionName="alpha 0.0.11b">
 
 
-    <uses-sdk
+<uses-sdk
         android:minSdkVersion="8"
         android:targetSdkVersion="18" />
 

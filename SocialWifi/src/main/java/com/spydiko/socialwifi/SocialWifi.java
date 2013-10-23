@@ -47,9 +47,9 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 	public static SharedPreferences.Editor editor;
 	private WifiManager wifi;
 	private ConnectivityManager connectivityManager;
-    //	private FileOutputStream outputStream;
-    private OutputStreamWriter osw;
-	private ArrayList<WifiPass> wifies,pyWifies;
+	//	private FileOutputStream outputStream;
+	private OutputStreamWriter osw;
+	private ArrayList<WifiPass> wifies, pyWifies;
 	private double[] location_now;
 	private float areaRadius;
 
@@ -429,7 +429,7 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 
 		gotLocation = false;
 		Log.d(TAG, "getLocation");
-	  /*
+		  /*
      * Loop over the array backwards, and if you get an accurate location,
      * then break out the loop
      */
@@ -471,7 +471,8 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
 		Log.d(TAG, s + " changed!");
-		if (s.equals("area_radius_list")) setAreaRadius(Float.valueOf(sharedPreferences.getString("area_radius_list", "3")));
+		if (s.equals("area_radius_list"))
+			setAreaRadius(Float.valueOf(sharedPreferences.getString("area_radius_list", "3")));
 
 	}
 
@@ -577,18 +578,18 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 	}
 
 	public void storeXML(byte[] buffer) {
-        try {
-            File file = new File(getFilesDir(), "server.xml");
-            boolean deleted = file.delete();
-            Log.d(TAG, "server deletion is " + deleted);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+		try {
+			File file = new File(getFilesDir(), "server.xml");
+			boolean deleted = file.delete();
+			Log.d(TAG, "server deletion is " + deleted);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-        try {
-            Log.d(TAG, "buffer to write: " + buffer.length);
-            FileOutputStream outputStream = openFileOutput("server.xml", Context.MODE_PRIVATE);
-            outputStream.write(buffer);
+		try {
+			Log.d(TAG, "buffer to write: " + buffer.length);
+			FileOutputStream outputStream = openFileOutput("server.xml", Context.MODE_PRIVATE);
+			outputStream.write(buffer);
 			outputStream.close();
 		} catch (Exception e) {
 			e.printStackTrace();

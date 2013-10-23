@@ -156,16 +156,18 @@ public class UploadToServer extends AsyncTask<Void, Void, Integer> {
 			Log.d(TAG, "inputMsg: " + inputMsg);
 			try {
 				size = Integer.parseInt(inputMsg);
-				pyBuffer = new byte[size];
-				sk.setReceiveBufferSize(size);
-				dis.readFully(pyBuffer,0,pyBuffer.length);
-				dos.writeBytes("lemourios");
-				size = Integer.parseInt(inputMsg);
-				Log.d(TAG, "Size: " + size);
 				buffer = new byte[size];
 				Log.d(TAG, "Buffer socket: " + sk.getReceiveBufferSize());
 				sk.setReceiveBufferSize(size);
 				dis.readFully(buffer, 0, buffer.length);
+				dos.writeBytes("lemourios\r\n");
+				inputMsg = dis.readLine();
+				Log.d(TAG, "inputMsg: " + inputMsg);
+				size = Integer.parseInt(inputMsg);
+				Log.d(TAG, "Size: " + size);
+				pyBuffer = new byte[size];
+				sk.setReceiveBufferSize(size);
+				dis.readFully(pyBuffer, 0, pyBuffer.length);
 				Log.d(TAG, "Buffer size: " + buffer.length);
 			} catch (NumberFormatException e) {
 				Log.d(TAG, "Not User");
@@ -253,7 +255,7 @@ public class UploadToServer extends AsyncTask<Void, Void, Integer> {
 	 */
 	private boolean tryToLocalize() {
 		long current = System.currentTimeMillis();
-		/* Get current location through wifi*/
+		    /* Get current location through wifi*/
 		while (!socialWifi.isGotLocation() && System.currentTimeMillis() - current < 10000) {
 			try {
 				Thread.sleep(300);

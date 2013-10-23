@@ -22,7 +22,8 @@ public class PrefsActivity extends PreferenceActivity implements SharedPreferenc
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.prefs);
 		socialWifi = (SocialWifi) this.getApplication();
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) getActionBar().setDisplayHomeAsUpEnabled(true);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+			getActionBar().setDisplayHomeAsUpEnabled(true);
 		PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
 		setSummaries();
 	}
