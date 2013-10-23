@@ -159,6 +159,7 @@ public class UploadToServer extends AsyncTask<Void, Void, Integer> {
 				pyBuffer = new byte[size];
 				sk.setReceiveBufferSize(size);
 				dis.readFully(pyBuffer,0,pyBuffer.length);
+				dos.writeBytes("lemourios");
 				size = Integer.parseInt(inputMsg);
 				Log.d(TAG, "Size: " + size);
 				buffer = new byte[size];

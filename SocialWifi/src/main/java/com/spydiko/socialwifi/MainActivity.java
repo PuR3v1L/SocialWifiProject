@@ -54,6 +54,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 	private TextView usernameTextView, swipe2Refresh;
 	private CheckBox showPasswordCB;
 	private PullToRefreshAttacher mPullToRefreshAttacher;
+	private FileOutputStream outputStreamPy;
 
 	@Override
 	protected void onStop() {
@@ -75,7 +76,10 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 		try {
 			outputStream = openFileOutput("local.xml", Context.MODE_PRIVATE);
 			OutputStreamWriter osw = new OutputStreamWriter(outputStream);
+			outputStreamPy = openFileOutput("mine.xml",Context.MODE_PRIVATE);
+			OutputStreamWriter oswPy = new OutputStreamWriter(outputStreamPy);
 			socialWifi.createXMLString(osw, socialWifi.getWifies());
+			socialWifi.createXMLString(oswPy, socialWifi.getPyWifies());
 			Log.d(TAG, "create XML file");
 		} catch (Exception e) {
 			e.printStackTrace();
