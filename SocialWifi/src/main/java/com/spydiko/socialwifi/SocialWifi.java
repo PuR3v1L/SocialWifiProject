@@ -44,12 +44,12 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 	private static final long MINIMUM_DISTANCE_CHANGE_FOR_UPDATES = 1; // in Meters
 	private static final long MINIMUM_TIME_BETWEEN_UPDATES = 1000; // in Milliseconds
 	private SharedPreferences prefs;
-	private SharedPreferences.Editor editor;
+	public static SharedPreferences.Editor editor;
 	private WifiManager wifi;
 	private ConnectivityManager connectivityManager;
     //	private FileOutputStream outputStream;
     private OutputStreamWriter osw;
-	private ArrayList<WifiPass> wifies;
+	private ArrayList<WifiPass> wifies,pyWifies;
 	private double[] location_now;
 	private float areaRadius;
 
@@ -57,6 +57,7 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 		super.onCreate();
 		BugSenseHandler.initAndStartSession(this, "6acdeebc");
 		wifies = new ArrayList<WifiPass>();
+		pyWifies = new ArrayList<WifiPass>();
 		wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -391,6 +392,9 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 				} else if (check == 3 && name.equals("stringstart")) {
 					ssid = xpp.getText();
 					//                    Log.d(TAG, "ssid: " + ssid);
+					check = 4;
+				} else if (check == 4 && name.equals("stringstart")) {
+					bssid = xpp.getText();
 					check = -1;
 				}
 			} else if (eventType == XmlPullParser.END_TAG) {
@@ -402,7 +406,7 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 					Double lon = Double.parseDouble(longitude);
 					temp.add(lat);
 					temp.add(lon);
-					wifiPass = new WifiPass(ssid, "", "", temp);
+					wifiPass = new WifiPass(ssid, bssid, "", temp);
 					userData.add(wifiPass);
 					check = 0;
 				}
@@ -446,7 +450,6 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 		Log.d(TAG, "areaRadius changed to: " + areaRadius);
 		this.areaRadius = areaRadius;
 		editor.putFloat("areaRadius", areaRadius);
-		editor.commit();
 	}
 
 	public boolean isGotLocation() {
@@ -492,6 +495,14 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 
 	public void logout() {
 		setSharedPreferenceBoolean("notFirstTime", false);
+	}
+
+	public ArrayList<WifiPass> getPyWifies() {
+		return pyWifies;
+	}
+
+	public void setPyWifies(ArrayList<WifiPass> pyWifies) {
+		this.pyWifies = pyWifies;
 	}
 
 	private class MyLocationListener implements LocationListener {

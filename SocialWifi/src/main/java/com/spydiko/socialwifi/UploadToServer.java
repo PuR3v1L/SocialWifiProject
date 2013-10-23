@@ -35,7 +35,7 @@ public class UploadToServer extends AsyncTask<Void, Void, Integer> {
 	private int size;
 	private boolean add, report, refresh;
 	private String ssid, bssid, password;
-	private byte[] buffer;
+	private byte[] buffer, pyBuffer;
 	private SocialWifi socialWifi;
 	private double[] location;
 	private ConnectivityManager connectivityManager;
@@ -156,13 +156,17 @@ public class UploadToServer extends AsyncTask<Void, Void, Integer> {
 			Log.d(TAG, "inputMsg: " + inputMsg);
 			try {
 				size = Integer.parseInt(inputMsg);
+				pyBuffer = new byte[size];
+				sk.setReceiveBufferSize(size);
+				dis.readFully(pyBuffer,0,pyBuffer.length);
+				size = Integer.parseInt(inputMsg);
 				Log.d(TAG, "Size: " + size);
 				buffer = new byte[size];
 				Log.d(TAG, "Buffer socket: " + sk.getReceiveBufferSize());
 				sk.setReceiveBufferSize(size);
-                dis.readFully(buffer, 0, buffer.length);
-                Log.d(TAG, "Buffer size: " + buffer.length);
-            } catch (NumberFormatException e) {
+				dis.readFully(buffer, 0, buffer.length);
+				Log.d(TAG, "Buffer size: " + buffer.length);
+			} catch (NumberFormatException e) {
 				Log.d(TAG, "Not User");
 				e.printStackTrace();
 				socialWifi.logout();
@@ -356,6 +360,8 @@ public class UploadToServer extends AsyncTask<Void, Void, Integer> {
 					}
 					socialWifi.storeXML(buffer);
 					socialWifi.setWifies(socialWifi.readFromXML("server.xml"));
+					socialWifi.storeXML(pyBuffer);
+					socialWifi.setPyWifies(socialWifi.readFromXMLPython("server.xml"));
 				} else {
 					Toast.makeText(context, "Error updating...\nTry again later...", Toast.LENGTH_SHORT).show();
 				}

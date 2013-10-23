@@ -81,6 +81,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 			e.printStackTrace();
 		}
 		unregisterReceiver(broadcastReceiver);
+		SocialWifi.editor.commit();
 		Log.d(TAG, "onPause");
 	}
 
