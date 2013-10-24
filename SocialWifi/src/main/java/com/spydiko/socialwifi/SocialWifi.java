@@ -44,7 +44,7 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 	private static final long MINIMUM_DISTANCE_CHANGE_FOR_UPDATES = 1; // in Meters
 	private static final long MINIMUM_TIME_BETWEEN_UPDATES = 1000; // in Milliseconds
 	private SharedPreferences prefs;
-	public static SharedPreferences.Editor editor;
+	public SharedPreferences.Editor editor;
 	private WifiManager wifi;
 	private ConnectivityManager connectivityManager;
 	//	private FileOutputStream outputStream;
@@ -117,10 +117,16 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 		xmlSerializer.endDocument();
 	}
 
-	private void loadPreferences() {
+	public void loadPreferences() {
 		Log.d(TAG, "loadPreferences");
 		areaRadius = prefs.getFloat("areaRadius", 3);
 
+	}
+
+	public void savePreferences() {
+		Log.d(TAG, "savePreferences");
+		editor.putFloat("areaRadius", areaRadius);
+		editor.commit();
 	}
 
 	public ArrayList<WifiPass> readFromXML(String xmlFile) {
@@ -149,61 +155,33 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 		}
 
 		XmlPullParserFactory factory = null;
-		try
-
-		{
+		try {
 			factory = XmlPullParserFactory.newInstance();
-		} catch (
-				XmlPullParserException e2
-				)
-
-		{
+		} catch (XmlPullParserException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
-
 		factory.setNamespaceAware(true);
 		XmlPullParser xpp = null;
-		try
-
-		{
+		try {
 			xpp = factory.newPullParser();
-		} catch (
-				XmlPullParserException e2
-				)
-
-		{
+		} catch (XmlPullParserException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
-
-		try
-
-		{
+		try {
 			xpp.setInput(new StringReader(data));
-		} catch (
-				XmlPullParserException e1
-				)
-
-		{
+		} catch (XmlPullParserException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-
 		int eventType = 0;
-		try
-
-		{
+		try {
 			eventType = xpp.getEventType();
-		} catch (
-				XmlPullParserException e1
-				)
-
-		{
+		} catch (XmlPullParserException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-
 		WifiPass wifiPass;
 		String name = null;
 		int check = 0;
@@ -212,9 +190,7 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 		String bssid = null;
 		String latitude = null;
 		String longitude = null;
-		while (eventType != XmlPullParser.END_DOCUMENT)
-
-		{
+		while (eventType != XmlPullParser.END_DOCUMENT) {
 			if (eventType == XmlPullParser.START_DOCUMENT) {
 				//                System.out.println("Start document");
 			} else if (eventType == XmlPullParser.START_TAG) {
@@ -302,61 +278,33 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 		}
 
 		XmlPullParserFactory factory = null;
-		try
-
-		{
+		try {
 			factory = XmlPullParserFactory.newInstance();
-		} catch (
-				XmlPullParserException e2
-				)
-
-		{
+		} catch (XmlPullParserException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
-
 		factory.setNamespaceAware(true);
 		XmlPullParser xpp = null;
-		try
-
-		{
+		try {
 			xpp = factory.newPullParser();
-		} catch (
-				XmlPullParserException e2
-				)
-
-		{
+		} catch (XmlPullParserException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
-
-		try
-
-		{
+		try {
 			xpp.setInput(new StringReader(data));
-		} catch (
-				XmlPullParserException e1
-				)
-
-		{
+		} catch (XmlPullParserException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-
 		int eventType = 0;
-		try
-
-		{
+		try {
 			eventType = xpp.getEventType();
-		} catch (
-				XmlPullParserException e1
-				)
-
-		{
+		} catch (XmlPullParserException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-
 		WifiPass wifiPass;
 		String name = null;
 		int check = 0;
@@ -365,9 +313,7 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 		String bssid = null;
 		String latitude = null;
 		String longitude = null;
-		while (eventType != XmlPullParser.END_DOCUMENT)
-
-		{
+		while (eventType != XmlPullParser.END_DOCUMENT) {
 			if (eventType == XmlPullParser.START_DOCUMENT) {
 				//                System.out.println("Start document");
 			} else if (eventType == XmlPullParser.START_TAG) {
@@ -430,7 +376,7 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 		gotLocation = false;
 		Log.d(TAG, "getLocation");
 		  /*
-     * Loop over the array backwards, and if you get an accurate location,
+		 * Loop over the array backwards, and if you get an accurate location,
      * then break out the loop
      */
 		lm.requestLocationUpdates(
@@ -449,7 +395,7 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 	public void setAreaRadius(float areaRadius) {
 		Log.d(TAG, "areaRadius changed to: " + areaRadius);
 		this.areaRadius = areaRadius;
-		editor.putFloat("areaRadius", areaRadius);
+		//		editor.putFloat("areaRadius", areaRadius);
 	}
 
 	public boolean isGotLocation() {
