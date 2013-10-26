@@ -7,6 +7,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
+import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -52,6 +53,15 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 	private ArrayList<WifiPass> wifies, pyWifies;
 	private double[] location_now;
 	private float areaRadius;
+
+	static final int SECURITY_NONE = 0;
+	static final int SECURITY_WEP = 1;
+	static final int SECURITY_PSK = 2;
+	static final int SECURITY_EAP = 3;
+	/* These values come from "wifi_peap_phase2_entries" resource array */
+	public static final int WIFI_PEAP_PHASE2_NONE = 0;
+	public static final int WIFI_PEAP_PHASE2_MSCHAPV2 = 1;
+	public static final int WIFI_PEAP_PHASE2_GTC = 2;
 
 	public void onCreate() {
 		super.onCreate();
@@ -554,39 +564,88 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 
 
 	public void connect(String networkSSID, String networkPass, int typeOfEncryption) {
-		WifiConfiguration conf = new WifiConfiguration();
-		conf.SSID = "\"" + networkSSID + "\"";   // Please note the quotes. String should contain ssid in quotes
+		WifiConfiguration config = new WifiConfiguration();
+		config.SSID = "\"" + networkSSID + "\"";   // Please note the quotes. String should contain ssid in quotes
 		// Case of WPA
 		switch (typeOfEncryption) {
-			case 1:
-				Log.d(TAG, "WEP");
-				conf.wepKeys[0] = "\"" + networkPass + "\"";
-				conf.wepTxKeyIndex = 0;
-				conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-				conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
+			case SECURITY_NONE:
+				Log.d(TAG, "SECURITY_NONE");
+				config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
 				break;
-			case 2:
-				Log.d(TAG, "WPA/WPA");
-				conf.preSharedKey = "\"" + networkPass + "\"";
-				conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
-				conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
-				conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+			case SECURITY_WEP:
+				Log.d(TAG, "SECURITY_WEP");
+				config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+				config.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);
+				config.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.SHARED);
+				if (networkPass.length() != 0) {
+					int length = networkPass.length();
+					//					String password = networkPass.getText().toString();
+					// WEP-40, WEP-104, and 256-bit WEP (WEP-232?)
+					if ((length == 10 || length == 26 || length == 58) &&
+							networkPass.matches("[0-9A-Fa-f]*")) {
+						config.wepKeys[0] = networkPass;
+					} else {
+						config.wepKeys[0] = '"' + networkPass + '"';
+					}
+				}
 				break;
-			case 3:
-				Log.d(TAG, "WPA2");
-				conf.preSharedKey = quoteNonHex(networkPass, 64);
-				conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
-				conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
-				conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+			case SECURITY_PSK:
+				Log.d(TAG, "SECURITY_PSK");
+				config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+				if (networkPass.length() != 0) {
+					//					String password = mPasswordView.getText().toString();
+					if (networkPass.matches("[0-9A-Fa-f]{64}")) {
+						config.preSharedKey = networkPass;
+					} else {
+						config.preSharedKey = '"' + networkPass + '"';
+					}
+				}
+				break;
+			case SECURITY_EAP:
+
+				config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_EAP);
+				config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.IEEE8021X);
+				//				config.enterpriseConfig = new WifiEnterpriseConfig();
+				//				WifiEnterpriseConfig enterpriseConfig = mAccessPoint.getConfig().enterpriseConfig;
+				//				int eapMethod = enterpriseConfig.getEapMethod();
+				//				int phase2Method = enterpriseConfig.getPhase2Method();
+				//				config.enterpriseConfig.setEapMethod(eapMethod);
+				//				switch (eapMethod) {
+				//					case WifiEnterpriseConfig.Eap.PEAP:
+				// PEAP supports limited phase2 values
+				// Map the index from the PHASE2_PEAP_ADAPTER to the one used
+				// by the API which has the full list of PEAP methods.
+				//						switch(phase2Method) {
+				//							case WIFI_PEAP_PHASE2_NONE:
+				//								config.enterpriseConfig.setPhase2Method(WifiEnterpriseConfig.Phase2.NONE);
+				//								break;
+				//							case WIFI_PEAP_PHASE2_MSCHAPV2:
+				//								config.enterpriseConfig.setPhase2Method(WifiEnterpriseConfig.Phase2.MSCHAPV2);
+				//								break;
+				//							case WIFI_PEAP_PHASE2_GTC:
+				//								config.enterpriseConfig.setPhase2Method(WifiEnterpriseConfig.Phase2.GTC);
+				//								break;
+				//							default:
+				//								Log.e(TAG, "Unknown phase2 method" + phase2Method);
+				//								break;
+				//						}
+				//						break;
+				//					default:
+				// The default index from PHASE2_FULL_ADAPTER maps to the API
+				//						config.enterpriseConfig.setPhase2Method(phase2Method);
+				//						break;
+				//				}
+
 				break;
 			default:
 				break;
 		}
-		conf.status = WifiConfiguration.Status.ENABLED;
-		conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
-		conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
-		conf.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
-		int inet = wifi.addNetwork(conf);
+
+		config.status = WifiConfiguration.Status.ENABLED;
+		//		config.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
+		//		config.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
+		//		config.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+		int inet = wifi.addNetwork(config);
 		Log.d(TAG, "Added " + inet);
 		if (inet > 0) {
 			List<WifiConfiguration> list = wifi.getConfiguredNetworks();
@@ -603,6 +662,17 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 			}
 		}
 
+	}
+
+	public static int getSecurity(ScanResult result) {
+		if (result.capabilities.contains("WEP")) {
+			return SECURITY_WEP;
+		} else if (result.capabilities.contains("PSK")) {
+			return SECURITY_PSK;
+		} else if (result.capabilities.contains("EAP")) {
+			return SECURITY_EAP;
+		}
+		return SECURITY_NONE;
 	}
 
 	private static String quoteNonHex(String value, int... allowedLengths) {

@@ -64,19 +64,6 @@ public class Map extends Activity implements android.location.LocationListener {
 			}
 		}
 
-		try {
-			wifies = socialWifi.readFromXMLPython("mine.xml");
-			for (WifiPass wifi : wifies) {
-				// create marker
-				MarkerOptions marker = new MarkerOptions().position(new LatLng(wifi.getGeo().get(0), wifi.getGeo().get(1))).title(wifi.getSsid() + "\n" + wifi.getBssid());
-				marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
-				// adding marker
-				googleMap.addMarker(marker);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			Log.d(TAG, "mine.xml doesn't exist");
-		}
 
 		try {
 			wifies = socialWifi.readFromXML("local.xml");
@@ -100,6 +87,21 @@ public class Map extends Activity implements android.location.LocationListener {
 			Log.d(TAG, "local.xml doesn't exist");
 
 		}
+
+		try {
+			wifies = socialWifi.readFromXMLPython("mine.xml");
+			for (WifiPass wifi : wifies) {
+				// create marker
+				MarkerOptions marker = new MarkerOptions().position(new LatLng(wifi.getGeo().get(0), wifi.getGeo().get(1))).title(wifi.getSsid() + "\n" + wifi.getBssid());
+				marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+				// adding marker
+				googleMap.addMarker(marker);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.d(TAG, "mine.xml doesn't exist");
+		}
+
 
 		googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 

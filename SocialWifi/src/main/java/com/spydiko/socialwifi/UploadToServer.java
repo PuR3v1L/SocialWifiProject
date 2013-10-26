@@ -278,11 +278,11 @@ public class UploadToServer extends AsyncTask<Void, Void, Integer> {
 	private boolean tryToConnect() {
 		int typeOfEncryption = 0;
 		Log.d(TAG, "extraInfo: " + extraInfo);
-		if (extraInfo.contains("WEP")) typeOfEncryption = 1;
-		else if (extraInfo.contains("WPA2")) typeOfEncryption = 3;
-		else if (extraInfo.contains("WAP") || extraInfo.contains("WPA")) typeOfEncryption = 2;
+		//		if (extraInfo.contains("WEP")) typeOfEncryption = 1;
+		//		else if (extraInfo.contains("WPA2")) typeOfEncryption = 3;
+		//		else if (extraInfo.contains("WAP") || extraInfo.contains("WPA")) typeOfEncryption = 2;
 		socialWifi.removeNetwork(ssid);
-		socialWifi.connect(ssid, password, typeOfEncryption);
+		socialWifi.connect(ssid, password, Integer.valueOf(extraInfo));
 		/* Check if password is correct and if the phone can connect to the network*/
 		long current = System.currentTimeMillis();
 		NetworkInfo networkInfo;

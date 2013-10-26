@@ -47,7 +47,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 	private ArrayList<HashMap<String, String>> arrayList;
 	private HashMap<String, String> clickedWifi;
 	private ListView lv;
-	private String ITEM_KEY = "key", BSSID_KEY = "bssid", EXISTS_KEY = "exist", EXTRAS_KEY = "extra", IMAGE_KEY = "image", SIGNAL_KEY = "signal";
+	private String ITEM_KEY = "key", BSSID_KEY = "bssid", EXISTS_KEY = "exist", EXTRAS_KEY = "extra", IMAGE_KEY = "image", SIGNAL_KEY = "signal", ENTERPRISE_CONFIG_KEY = "enterprise";
 	private BroadcastReceiver broadcastReceiver;
 	private FileOutputStream outputStream;
 	private Context context;
@@ -249,7 +249,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 					item.put(IMAGE_KEY, Integer.toString(R.drawable.wifi_weak));
 				else
 					item.put(IMAGE_KEY, Integer.toString(R.drawable.wifi_no_signal));
-				item.put(EXTRAS_KEY, results.get(size).capabilities + "\n" + results.get(size).level);
+				item.put(EXTRAS_KEY, String.valueOf(SocialWifi.getSecurity(results.get(size))));
 				item.put(BSSID_KEY, results.get(size).BSSID);
 				item.put(EXISTS_KEY, "n");
 				for (int i = 0; i < arrayList.size(); i++) {
@@ -353,11 +353,11 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 				}
 			}
 		}
-		if (extraInfo.contains("WEP")) typeOfEncryption = 1;
-		else if (extraInfo.contains("WPA2")) typeOfEncryption = 3;
-		else if (extraInfo.contains("WAP") || extraInfo.contains("WPA")) typeOfEncryption = 2;
+		//		if (extraInfo.contains("WEP")) typeOfEncryption = 1;
+		//		else if (extraInfo.contains("WPA2")) typeOfEncryption = 3;
+		//		else if (extraInfo.contains("WAP") || extraInfo.contains("WPA")) typeOfEncryption = 2;
 		socialWifi.removeNetwork(ssid);
-		socialWifi.connect(ssid, password, typeOfEncryption);
+		socialWifi.connect(ssid, password, Integer.valueOf(extraInfo));
 		//                Toast.makeText(this, "Selected...\n" + clickedWifi.get(ITEM_KEY), Toast.LENGTH_SHORT).show();
 	}
 
