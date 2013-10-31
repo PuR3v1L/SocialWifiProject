@@ -13,7 +13,7 @@ public class SortBySignalStrength implements java.util.Comparator {
 	public int compare(Object lhs, Object rhs) {
 		HashMap<String, String> left = (HashMap<String, String>) lhs;
 		HashMap<String, String> right = (HashMap<String, String>) rhs;
-		//		Log.d(TAG, "left: " + Integer.valueOf(left.get(SIGNAL_KEY)) + " right: " + Integer.valueOf(right.get(SIGNAL_KEY)));
+		//                Log.d(TAG, "left: " + Integer.valueOf(left.get(SIGNAL_KEY)) + " right: " + Integer.valueOf(right.get(SIGNAL_KEY)));
 		if (Integer.valueOf(left.get(SIGNAL_KEY)) > Integer.valueOf(right.get(SIGNAL_KEY)))
 			return -1;
 		else if (Integer.valueOf(left.get(SIGNAL_KEY)) < Integer.valueOf(right.get(SIGNAL_KEY)))

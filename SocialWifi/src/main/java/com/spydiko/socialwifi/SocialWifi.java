@@ -7,7 +7,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
-import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -30,8 +29,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * Created by jim on 5/9/2013.
@@ -45,21 +42,21 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 	private static final long MINIMUM_TIME_BETWEEN_UPDATES = 1000; // in Milliseconds
 	private SharedPreferences prefs;
 	public SharedPreferences.Editor editor;
-	private WifiManager wifi;
-	private ConnectivityManager connectivityManager;
 	//	private FileOutputStream outputStream;
 	private OutputStreamWriter osw;
 	private ArrayList<WifiPass> wifies, pyWifies;
 	private double[] location_now;
 	private float areaRadius;
+	private WifiManager wifiManager;
+	private ConnectivityManager connectivityManager;
 
 	public void onCreate() {
 		super.onCreate();
 		BugSenseHandler.initAndStartSession(this, "6acdeebc");
+		wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+		connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		wifies = new ArrayList<WifiPass>();
 		pyWifies = new ArrayList<WifiPass>();
-		wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-		connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		prefs.registerOnSharedPreferenceChangeListener(this);
 		editor = prefs.edit();
@@ -68,14 +65,6 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 
 	public double[] getLocationCoord() {
 		return location_now;
-	}
-
-	public WifiManager getWifi() {
-		return wifi;
-	}
-
-	public ConnectivityManager getConnectivityManager() {
-		return connectivityManager;
 	}
 
 	public static void createXMLString(OutputStreamWriter out, ArrayList<WifiPass> wifies) throws IllegalArgumentException, IllegalStateException, IOException {
@@ -371,7 +360,7 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 	}
 
 	public void getLocation() {
-		lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
 		gotLocation = false;
 		Log.d(TAG, "getLocation");
@@ -414,6 +403,14 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 		this.wifies = wifies;
 	}
 
+	public ArrayList<WifiPass> getPyWifies() {
+		return pyWifies;
+	}
+
+	public void setPyWifies(ArrayList<WifiPass> pyWifies) {
+		this.pyWifies = pyWifies;
+	}
+
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
 		Log.d(TAG, s + " changed!");
@@ -444,12 +441,20 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 		setSharedPreferenceBoolean("notFirstTime", false);
 	}
 
-	public ArrayList<WifiPass> getPyWifies() {
-		return pyWifies;
+	public WifiManager getWifiManager() {
+		return wifiManager;
 	}
 
-	public void setPyWifies(ArrayList<WifiPass> pyWifies) {
-		this.pyWifies = pyWifies;
+	public void setWifiManager(WifiManager wifiManager) {
+		this.wifiManager = wifiManager;
+	}
+
+	public ConnectivityManager getConnectivityManager() {
+		return connectivityManager;
+	}
+
+	public void setConnectivityManager(ConnectivityManager connectivityManager) {
+		this.connectivityManager = connectivityManager;
 	}
 
 	private class MyLocationListener implements LocationListener {
@@ -481,48 +486,6 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 
 	}
 
-	public int addNewWifi(String ssid, String bssid, String password, List<Double> geo, ArrayList<WifiPass> arrayList) {
-		WifiPass wifiPass = new WifiPass(ssid, bssid, password, geo);
-		int check = checkIfWifiExists(wifiPass, arrayList);
-		int result = 0;
-		switch (check) {
-			case 0:
-				result = 0;
-				break;
-			case 1:
-				result = 1;
-				break;
-			case -1:
-				updatePassword();
-				result = -1;
-				break;
-			default:
-				break;
-		}
-		return result;
-	}
-
-	private void updatePassword() {
-
-	}
-
-	private void checkConnection() {
-
-	}
-
-	public int checkIfWifiExists(WifiPass wifiPass, ArrayList<WifiPass> arrayList) {
-		for (WifiPass temp : arrayList) {
-			if (wifiPass.getBssid().equals(temp.getBssid())) {
-				if (wifiPass.getPassword().equals(temp.getPassword())) {
-					return 0;
-				} else {
-					return -1;
-				}
-			}
-		}
-		return 1;
-	}
-
 	public void storeXML(byte[] buffer) {
 		try {
 			File file = new File(getFilesDir(), "server.xml");
@@ -541,112 +504,6 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 			e.printStackTrace();
 		}
 	}
-
-	public void removeNetwork(String ssid) {
-		List<WifiConfiguration> list = wifi.getConfiguredNetworks();
-		for (WifiConfiguration i : list) {
-			Log.d(TAG, i.SSID + " " + i.BSSID);
-			if (i.SSID != null && i.SSID.equals("\"" + ssid + "\"")) {
-				wifi.removeNetwork(i.networkId);
-			}
-		}
-	}
-
-
-	public void connect(String networkSSID, String networkPass, int typeOfEncryption) {
-		WifiConfiguration conf = new WifiConfiguration();
-		conf.SSID = "\"" + networkSSID + "\"";   // Please note the quotes. String should contain ssid in quotes
-		// Case of WPA
-		switch (typeOfEncryption) {
-			case 1:
-				Log.d(TAG, "WEP");
-				conf.wepKeys[0] = "\"" + networkPass + "\"";
-				conf.wepTxKeyIndex = 0;
-				conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-				conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
-				break;
-			case 2:
-				Log.d(TAG, "WPA/WPA");
-				conf.preSharedKey = "\"" + networkPass + "\"";
-				conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
-				conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
-				conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
-				break;
-			case 3:
-				Log.d(TAG, "WPA2");
-				conf.preSharedKey = quoteNonHex(networkPass, 64);
-				conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
-				conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
-				conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
-				break;
-			default:
-				break;
-		}
-		conf.status = WifiConfiguration.Status.ENABLED;
-		conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
-		conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
-		conf.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
-		int inet = wifi.addNetwork(conf);
-		Log.d(TAG, "Added " + inet);
-		if (inet > 0) {
-			List<WifiConfiguration> list = wifi.getConfiguredNetworks();
-			for (WifiConfiguration i : list) {
-				if (i.SSID != null && i.SSID.equals("\"" + networkSSID + "\"")) {
-					Log.d(TAG, "Done!");
-					wifi.disconnect();
-					boolean b = wifi.enableNetwork(inet, true);
-					Log.d(TAG, "Result " + b);
-					boolean c = wifi.reconnect();
-					Log.d(TAG, "Result " + c);
-					break;
-				}
-			}
-		}
-
-	}
-
-	private static String quoteNonHex(String value, int... allowedLengths) {
-		return isHexOfLength(value, allowedLengths) ? value : convertToQuotedString(value);
-	}
-
-	/**
-	 * Encloses the incoming string inside double quotes, if it isn't already quoted.
-	 *
-	 * @param string the input string
-	 * @return a quoted string, of the form "input".  If the input string is null, it returns null
-	 * as well.
-	 */
-	private static String convertToQuotedString(String string) {
-		if (string == null || string.length() == 0) {
-			return null;
-		}
-		// If already quoted, return as-is
-		if (string.charAt(0) == '"' && string.charAt(string.length() - 1) == '"') {
-			return string;
-		}
-		return '\"' + string + '\"';
-	}
-
-	private static final Pattern HEX_DIGITS = Pattern.compile("[0-9A-Fa-f]+");
-
-	/**
-	 * @param value          input to check
-	 * @param allowedLengths allowed lengths, if any
-	 * @return true if value is a non-null, non-empty string of hex digits, and if allowed lengths are given, has
-	 * an allowed length
-	 */
-	private static boolean isHexOfLength(CharSequence value, int... allowedLengths) {
-		if (value == null || !HEX_DIGITS.matcher(value).matches()) {
-			return false;
-		}
-		if (allowedLengths.length == 0) {
-			return true;
-		}
-		for (int length : allowedLengths) {
-			if (value.length() == length) {
-				return true;
-			}
-		}
-		return false;
-	}
 }
+
+

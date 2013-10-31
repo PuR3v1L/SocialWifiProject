@@ -4,8 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -37,6 +40,7 @@ public class Map extends Activity implements android.location.LocationListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.map_layout);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) getActionBar().setDisplayHomeAsUpEnabled(true);
 		socialWifi = (SocialWifi) getApplication();
 		try {
 			// Loading map
@@ -64,19 +68,6 @@ public class Map extends Activity implements android.location.LocationListener {
 			}
 		}
 
-		try {
-			wifies = socialWifi.readFromXMLPython("mine.xml");
-			for (WifiPass wifi : wifies) {
-				// create marker
-				MarkerOptions marker = new MarkerOptions().position(new LatLng(wifi.getGeo().get(0), wifi.getGeo().get(1))).title(wifi.getSsid() + "\n" + wifi.getBssid());
-				marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
-				// adding marker
-				googleMap.addMarker(marker);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			Log.d(TAG, "mine.xml doesn't exist");
-		}
 
 		try {
 			wifies = socialWifi.readFromXML("local.xml");
@@ -100,6 +91,21 @@ public class Map extends Activity implements android.location.LocationListener {
 			Log.d(TAG, "local.xml doesn't exist");
 
 		}
+
+		try {
+			wifies = socialWifi.readFromXMLPython("mine.xml");
+			for (WifiPass wifi : wifies) {
+				// create marker
+				MarkerOptions marker = new MarkerOptions().position(new LatLng(wifi.getGeo().get(0), wifi.getGeo().get(1))).title(wifi.getSsid() + "\n" + wifi.getBssid());
+				marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+				// adding marker
+				googleMap.addMarker(marker);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.d(TAG, "mine.xml doesn't exist");
+		}
+
 
 		googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 
@@ -142,5 +148,16 @@ public class Map extends Activity implements android.location.LocationListener {
 	@Override
 	public void onProviderDisabled(String s) {
 
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			// Respond to the action bar's Up/Home button
+			case android.R.id.home:
+				NavUtils.navigateUpFromSameTask(this);
+				return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 }

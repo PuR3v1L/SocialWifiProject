@@ -8,8 +8,8 @@
         <shape android:shape="rectangle">
             <stroke
                 android:width="2dp"
-                android:color="#66eeeeee" />
-            <solid android:color="#00ffffff" />
+                android:color="#66eeeeee"/>
+            <solid android:color="#00ffffff"/>
         </shape>
     </item>
 </layer-list>

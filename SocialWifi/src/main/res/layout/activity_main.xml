@@ -76,6 +76,7 @@
             android:fadingEdgeLength="5dp"
             android:layout_height="fill_parent"
             android:scrollbars="vertical"
+            android:visibility="gone"
             android:listSelector="@android:color/transparent"
             android:background="@android:color/transparent"
 

@@ -6,7 +6,9 @@ import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NavUtils;
 import android.util.Log;
+import android.view.MenuItem;
 
 /**
  * Created by spiros on 10/3/13.
@@ -42,5 +44,16 @@ public class PrefsActivity extends PreferenceActivity implements SharedPreferenc
 		Log.d(TAG, "onSharedPreferenceChanged: " + s);
 		if (s.equals("areaRadius")) setAreaRadiusListSum();
 
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			// Respond to the action bar's Up/Home button
+			case android.R.id.home:
+				NavUtils.navigateUpFromSameTask(this);
+				return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 }

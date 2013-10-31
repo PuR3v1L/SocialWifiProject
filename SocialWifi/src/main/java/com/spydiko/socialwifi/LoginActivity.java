@@ -21,14 +21,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
-import java.net.SocketException;
-
 /**
  * Activity which displays a login screen to the user, offering registration as
  * well.
@@ -75,7 +67,7 @@ public class LoginActivity extends Activity {
 		});
 
 		socialWifi = (SocialWifi) getApplication();
-		macAddress = socialWifi.getWifi().getConnectionInfo().getMacAddress();
+		macAddress = socialWifi.getWifiManager().getConnectionInfo().getMacAddress();
 		mLoginFormView = findViewById(R.id.login_form);
 		mLoginStatusView = findViewById(R.id.login_status);
 		mLoginStatusMessageView = (TextView) findViewById(R.id.login_status_message);
@@ -228,11 +220,8 @@ public class LoginActivity extends Activity {
 	public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
 		private Context context;
-		private Socket sk;
-		private DataOutputStream dos;
-		private DataInputStream dis;
-		private String response;
 		private boolean sign_in;
+		private ServerUtils lemourios;
 
 		public UserLoginTask(Context loginActivity) {
 			this.context = loginActivity;
@@ -243,39 +232,15 @@ public class LoginActivity extends Activity {
 			this.sign_in = sign_in;
 		}
 
-		public boolean sendCredentials(String action) {
-			try {
-				sk = new Socket();
-				SocketAddress remoteaddr = new InetSocketAddress(hostIPstr, serverPort);
-				sk.setSoTimeout(5000);
-				sk.connect(remoteaddr, 5000);
-				Log.d(TAG, "Socket opened");
-				dos = new DataOutputStream(sk.getOutputStream());
-				dis = new DataInputStream(sk.getInputStream());
-				Log.d(TAG, "Trying to sent message");
-				dos.writeBytes(action + "\r\n");
-				dos.writeBytes(mEmail + "\r\n");
-				dos.writeBytes(macAddress + "\r\n");
-				dos.writeBytes(mPassword + "\r\n");
-				response = dis.readLine();
-			} catch (SocketException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			if (response == null) {
-				return false;
-			} else if (response.equals("Done")) {
-				return true;
+		@Override
+		protected Boolean doInBackground(Void... params) {
+			lemourios = new ServerUtils();
+			if (lemourios.tryToOpenSocket()) {
+				if (sign_in) return lemourios.sendCredentials("login", mEmail, macAddress, mPassword);
+				else return lemourios.sendCredentials("register", mEmail, macAddress, mPassword);
 			} else {
 				return false;
 			}
-		}
-
-		@Override
-		protected Boolean doInBackground(Void... params) {
-			if (sign_in) return sendCredentials("login");
-			else return sendCredentials("register");
 		}
 
 		@Override
@@ -283,12 +248,9 @@ public class LoginActivity extends Activity {
 			mAuthTask = null;
 			showProgress(false);
 			Log.d(TAG, "Closing Everything");
-			try {
-				sk.close();
-				dos.close();
-				dis.close();
-			} catch (Exception e) {
-				e.printStackTrace();
+			if (!lemourios.tryToCloseSocket()) {
+				Toast.makeText(context, "Connection Error", Toast.LENGTH_SHORT).show();
+				finish();
 			}
 			if (success) {
 				Toast.makeText(context, "OK!", Toast.LENGTH_SHORT).show();

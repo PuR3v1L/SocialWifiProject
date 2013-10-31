@@ -7,6 +7,6 @@
             android:title="@string/radius_pref_title"
             android:entries="@array/radius_list"
             android:entryValues="@array/radius_list_values"
-            android:defaultValue="3" />
+            android:defaultValue="3"/>
     </PreferenceCategory>
 </PreferenceScreen>
