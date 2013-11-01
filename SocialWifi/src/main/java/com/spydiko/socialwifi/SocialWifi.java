@@ -46,6 +46,11 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 	//	private FileOutputStream outputStream;
 	private OutputStreamWriter osw;
 	private ArrayList<WifiPass> wifies, pyWifies;
+
+	public void setLocation_now(double[] location_now) {
+		this.location_now = location_now;
+	}
+
 	private double[] location_now;
 	private float areaRadius;
 	private WifiManager wifiManager;
@@ -63,6 +68,7 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 		prefs.registerOnSharedPreferenceChangeListener(this);
 		editor = prefs.edit();
 		loadPreferences();
+		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 	}
 
 	public double[] getLocationCoord() {
@@ -365,8 +371,6 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 	}
 
 	public void getLocation() {
-		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
 		gotLocation = false;
 		Log.d(TAG, "getLocation");
 		  /*

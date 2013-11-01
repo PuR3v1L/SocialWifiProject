@@ -42,7 +42,7 @@ public class PrefsActivity extends PreferenceActivity implements SharedPreferenc
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
 		Log.d(TAG, "onSharedPreferenceChanged: " + s);
-		if (s.equals("areaRadius")) setAreaRadiusListSum();
+		if (s.equals("area_radius_list")) setAreaRadiusListSum();
 
 	}
 
