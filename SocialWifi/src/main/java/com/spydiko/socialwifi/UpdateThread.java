@@ -77,6 +77,7 @@ public class UpdateThread extends AsyncTask<Void, Void, Integer> {
 			socialWifi.setWifies(socialWifi.readFromXML("server.xml"));
 			socialWifi.storeXML(serverUtils.getPyBuffer());
 			socialWifi.setPyWifies(socialWifi.readFromXMLPython("server.xml"));
+			socialWifi.getWifiManager().startScan();
 		}
 		loadingDialog.dismiss();
 	}

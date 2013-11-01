@@ -96,7 +96,7 @@ public class ReportThread extends AsyncTask<Void, Void, Integer> {
 				}
 			}
 			socialWifi.setWifies(tmp);
-
+			socialWifi.getWifiManager().startScan();
 		}
 		loadingDialog.dismiss();
 	}
