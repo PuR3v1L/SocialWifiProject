@@ -90,6 +90,7 @@ public class UploadPasswordThread extends AsyncTask<Void, Void, Integer> {
 			loc.add(1, location[1]);
 			tmp.add(new WifiPass(ssid, bssid, password, loc));
 			socialWifi.setWifies(tmp);
+			socialWifi.getWifiManager().startScan();
 		}
 		loadingDialog.dismiss();
 	}
