@@ -61,24 +61,15 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 		socialWifi = (SocialWifi) getApplication();
 		usernameTextView = (TextView) findViewById(R.id.usernameTextView);
 		swipe2Refresh = (TextView) findViewById(R.id.swipe2refresh);
-		/*if (!socialWifi.getSharedPreferenceBoolean("notFirstTime")) {
+		if (!socialWifi.getSharedPreferenceBoolean("notFirstTime")) {
 			Intent intent = new Intent(this, LoginActivity.class);
 			startActivityForResult(intent, 1);
-		}*/
-		//                buttonScan = (Button) findViewById(R.id.buttonScan);
-		//                buttonScan.setOnClickListener(this);
+		}
+
 		context = this;
 
-		//                if (!socialWifi.getSharedPreferenceString("username").equals("")) {
-		//                        Toast.makeText(this, "Welcome " + socialWifi.getSharedPreferenceString("username"), Toast.LENGTH_LONG).show();
-		//                }
 
 		usernameTextView.setText(socialWifi.getSharedPreferenceString("username") + " ");
-		             /* AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                LayoutInflater inflater = this.getLayoutInflater();
-builder.setView(inflater.inflate(R.layout.loading_dialog,null));
-loadingDialog = builder.create();*/
-		// loadingDialog.setCanceledOnTouchOutside(false);
 		// ----------- Read all the saved wifi --------------
 		File file = new File(getFilesDir(), "local.xml");
 		if (file.exists()) {
@@ -121,17 +112,7 @@ loadingDialog = builder.create();*/
 			}
 
 		};
-		// simpleAdapter = new InteractiveSimpleAdapter(this, arrayList, R.layout.row, new String[]{ITEM_KEY}, new int[]{R.id.list_value},socialWifi,this);
 
-/* File file = new File(getFilesDir(), "server.xml");
-if (file.exists()) {
-socialWifi.setWifies(socialWifi.readFromXML("server.xml"));
-// Log.d (TAG,"exists");
-} else {
-// Log.d(TAG,"doesn't exist");
-}*/
-
-		// wifies=socialWifi.ReadFromXML("pass.xml");
 
 		broadcastReceiver = new
 
@@ -165,7 +146,6 @@ socialWifi.setWifies(socialWifi.readFromXML("server.xml"));
 		// Give the PullToRefreshAttacher to the PullToRefreshLayout, along with a refresh listener.
 		ptrLayout.setPullToRefreshAttacher(mPullToRefreshAttacher, this);
 
-		//		lv.setAdapter(simpleAdapter);
 	}
 
 	@Override
@@ -258,10 +238,6 @@ socialWifi.setWifies(socialWifi.readFromXML("server.xml"));
 		}
 
 		switch (v.getId()) {
-			//                        case (R.id.buttonScan):
-			//                                socialWifi.getWifi().startScan();
-			// Log.d(TAG, "wifi start scan");
-			//                                break;
 			case (R.id.right):
 				clickedWifi = (HashMap<String, String>) simpleAdapter.getItem((Integer) v.getTag());
 				if (clickedWifi.get(EXISTS_KEY).equals("y")) {

@@ -3,30 +3,43 @@ package com.spydiko.socialwifi;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.view.Window;
 import android.widget.Toast;
 
-/**
- * Created by jim on 29/10/2013.
- */
-public class UpdateThread extends AsyncTask<Void, Void, Integer> {
+import java.util.ArrayList;
 
-	private final Context context;
-	private Dialog loadingDialog;
-	private SocialWifi socialWifi;
-	private ServerUtils serverUtils;
+/**
+ * Created by spiros on 11/1/13.
+ */
+public class ReportThread extends AsyncTask<Void, Void, Integer> {
+
+	private final static String TAG = ReportThread.class.getSimpleName();
 	private final static int FAILED_TO_LOCALIZE = -1;
 	private final static int FAILED_TO_OPEN_SOCKET = -2;
 	private final static int FAILED_TO_ADD = -3;
 	private final static int FAILED_TO_UPDATE = -4;
 	private final static int FAILED_TO_REPORT = -5;
 	private final static int FAILED_TO_CONNECT = -6;
+	private final Context context;
+	private final String ssid;
+	private final String extraInfo;
+	private final String bssid;
+	private final String password;
+	private Dialog loadingDialog;
+	private ServerUtils serverUtils;
+	private SocialWifi socialWifi;
 	private boolean correctUser;
 
 
-	public UpdateThread(Context context, SocialWifi socialWifi) {
+	public ReportThread(Context context, SocialWifi socialWifi, String ssid, String bssid, String password, String extraInfo) {
 		this.context = context;
 		this.socialWifi = socialWifi;
+		this.ssid = ssid;
+		this.bssid = bssid;
+		this.password = password;
+		this.extraInfo = extraInfo;
+
 	}
 
 	@Override
@@ -39,14 +52,16 @@ public class UpdateThread extends AsyncTask<Void, Void, Integer> {
 		loadingDialog.show();
 		serverUtils = new ServerUtils();
 		correctUser = serverUtils.setUsername(socialWifi.getSharedPreferenceString("username"));
+		serverUtils.setWiFiInfo(ssid, bssid, password, extraInfo);
 	}
 
 	@Override
 	protected Integer doInBackground(Void... params) {
 		if (!correctUser) return ServerUtils.WRONG_USER;
-		if (!serverUtils.tryToLocalize(socialWifi)) return FAILED_TO_LOCALIZE;
+		if (!serverUtils.tryToConnect(socialWifi.getWifiManager(), socialWifi.getConnectivityManager())) return FAILED_TO_CONNECT;
 		if (!serverUtils.tryToOpenSocket()) return FAILED_TO_OPEN_SOCKET;
-		return serverUtils.tryToUpdate(socialWifi.getAreaRadius(), socialWifi.getLocationCoord());
+		return serverUtils.tryToReport();
+
 	}
 
 	@Override
@@ -69,14 +84,19 @@ public class UpdateThread extends AsyncTask<Void, Void, Integer> {
 			Toast.makeText(context, "NOT VALID USER...Logged out", Toast.LENGTH_SHORT).show();
 			socialWifi.logout();
 			loadingDialog.dismiss();
-		} else if (state == ServerUtils.WRONG_UPDATE) {
-			Toast.makeText(context, "Error updating...\nTry again later...", Toast.LENGTH_SHORT).show();
-		} else if (state == ServerUtils.CORRECT_UPDATE) {
-			Toast.makeText(context, "Success!\nUpdate worked!", Toast.LENGTH_SHORT).show();
-			socialWifi.storeXML(serverUtils.getBuffer());
-			socialWifi.setWifies(socialWifi.readFromXML("server.xml"));
-			socialWifi.storeXML(serverUtils.getPyBuffer());
-			socialWifi.setPyWifies(socialWifi.readFromXMLPython("server.xml"));
+		} else if (state == ServerUtils.WRONG_REPORT) {
+			Toast.makeText(context, "Error reporting...\nTry again later...", Toast.LENGTH_SHORT).show();
+		} else if (state == ServerUtils.CORRECT_REPORT) {
+			Toast.makeText(context, "Success!\nReport worked!", Toast.LENGTH_SHORT).show();
+			ArrayList<WifiPass> tmp = socialWifi.getWifies();
+			for (WifiPass wifi : tmp) {
+				if (wifi.getBssid() == bssid) {
+					wifi.setPassword(password);
+					Log.d(TAG, "password changed to " + password);
+				}
+			}
+			socialWifi.setWifies(tmp);
+
 		}
 		loadingDialog.dismiss();
 	}

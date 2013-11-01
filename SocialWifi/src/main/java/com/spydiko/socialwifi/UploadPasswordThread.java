@@ -28,6 +28,8 @@ public class UploadPasswordThread extends AsyncTask<Void, Void, Integer> {
 	private final static int FAILED_TO_UPDATE = -4;
 	private final static int FAILED_TO_REPORT = -5;
 	private final static int FAILED_TO_CONNECT = -6;
+	private boolean correctUser;
+
 
 	public UploadPasswordThread(Context context, SocialWifi socialWifi, String ssid, String bssid, String password, String extraInfo) {
 		this.context = context;
@@ -47,12 +49,13 @@ public class UploadPasswordThread extends AsyncTask<Void, Void, Integer> {
 		loadingDialog.setCancelable(false);
 		loadingDialog.show();
 		serverUtils = new ServerUtils();
-		serverUtils.setUsername(socialWifi.getSharedPreferenceString("username"));
+		correctUser = serverUtils.setUsername(socialWifi.getSharedPreferenceString("username"));
 		serverUtils.setWiFiInfo(ssid, bssid, password, extraInfo);
 	}
 
 	@Override
 	protected Integer doInBackground(Void... params) {
+		if (!correctUser) return ServerUtils.WRONG_USER;
 		if (!serverUtils.tryToConnect(socialWifi.getWifiManager(), socialWifi.getConnectivityManager())) return FAILED_TO_CONNECT;
 		if (!serverUtils.tryToLocalize(socialWifi)) return FAILED_TO_LOCALIZE;
 		if (!serverUtils.tryToOpenSocket()) return FAILED_TO_OPEN_SOCKET;

@@ -78,8 +78,11 @@ public class ServerUtils {
 		}
 	}
 
-	public void setUsername(String username) {
+	public boolean setUsername(String username) {
+
+		if (username.equals("")) return false;
 		this.username = username;
+		return true;
 	}
 
 	public void setWiFiInfo(String ssid, String bssid, String password, String extraInfo) {
@@ -138,7 +141,7 @@ public class ServerUtils {
 		//                else if (extraInfo.contains("WAP") || extraInfo.contains("WPA")) typeOfEncryption = 2;
 		WifiUtils.removeNetwork(ssid, wifiManager);
 		WifiUtils.connect(WifiUtils.createConfigFile(ssid, password, extraInfo), wifiManager, connectivityManager);
-                /* Check if password is correct and if the phone can connect to the network*/
+		            /* Check if password is correct and if the phone can connect to the network*/
 		long current = System.currentTimeMillis();
 		NetworkInfo networkInfo;
 		boolean ok = false;
