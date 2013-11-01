@@ -269,7 +269,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 				clickedWifi = (HashMap<String, String>) simpleAdapter.getItem((Integer) v.getTag());
 				if (clickedWifi.get(EXISTS_KEY).equals("y")) {
 					Toast.makeText(this, "Error button clicked...\n" + clickedWifi.get(ITEM_KEY), Toast.LENGTH_SHORT).show();
-					// TODO
 					reportNewPassword();
 				} else {
 					Toast.makeText(this, "Upload button clicked...\n" + clickedWifi.get(ITEM_KEY), Toast.LENGTH_SHORT).show();
