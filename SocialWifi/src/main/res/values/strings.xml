@@ -23,6 +23,7 @@
     <string name="pull2refresh">Pull to refresh</string>
     <string name="searching">Searching...</string>
     <string name="release">Release</string>
+    <string name="setOnWifi">Enable on WiFi</string>
 
 
 </resources>

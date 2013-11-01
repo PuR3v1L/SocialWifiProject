@@ -13,4 +13,9 @@
     <item
         android:id="@+id/map_pref"
         android:title="@string/map_pref"/>
+
+    <item
+        android:id="@+id/setOnWifi"
+        android:title="@string/setOnWifi"
+        android:checkable="true"/>
 </menu>

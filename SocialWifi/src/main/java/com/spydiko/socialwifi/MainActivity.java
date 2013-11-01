@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -210,6 +211,22 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 				Intent intent = new Intent(this, LoginActivity.class);
 				startActivityForResult(intent, 1);
 				break;
+			case R.id.setOnWifi:
+				if (socialWifi.getBoot()) {
+					item.setChecked(false);
+					socialWifi.setBoot(false);
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)
+						item.setIcon(android.R.drawable.button_onoff_indicator_off);
+					// if(AppSpecificOrientation.LOG) Log.d(TAG, "onBoot set to false");
+				} else {
+					item.setChecked(true);
+					socialWifi.setBoot(true);
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)
+						item.setIcon(android.R.drawable.button_onoff_indicator_on);
+					// if(AppSpecificOrientation.LOG) Log.d(TAG, "onBoot set to true");
+				}
+
+
 		}
 		return true;
 	}
@@ -218,6 +235,16 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
+
+		if (socialWifi.getBoot()) {
+			menu.findItem(R.id.setOnWifi).setChecked(true);
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)
+				menu.findItem(R.id.setOnWifi).setIcon(android.R.drawable.button_onoff_indicator_on);
+		} else {
+			menu.findItem(R.id.setOnWifi).setChecked(false);
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)
+				menu.findItem(R.id.setOnWifi).setIcon(android.R.drawable.button_onoff_indicator_off);
+		}
 		return true;
 	}
 
@@ -243,7 +270,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 				if (clickedWifi.get(EXISTS_KEY).equals("y")) {
 					Toast.makeText(this, "Error button clicked...\n" + clickedWifi.get(ITEM_KEY), Toast.LENGTH_SHORT).show();
 					// TODO
-					//					reportNewPassword();
+					reportNewPassword();
 				} else {
 					Toast.makeText(this, "Upload button clicked...\n" + clickedWifi.get(ITEM_KEY), Toast.LENGTH_SHORT).show();
 					uploadPassword();
@@ -256,6 +283,44 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 			default:
 				break;
 		}
+	}
+
+	private void reportNewPassword() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		LayoutInflater inflater = this.getLayoutInflater();
+		final View view = inflater.inflate(R.layout.upload_dialog, null);
+		showPasswordCB = (CheckBox) view.findViewById(R.id.show_password);
+		showPasswordCB.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+				EditText password = (EditText) view.findViewById(R.id.dialog_password);
+				if (b) {
+					password.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+				} else {
+					password.setInputType(129);
+				}
+			}
+		});
+		builder.setView(view)
+				.setPositiveButton(R.string.uploadPassword, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int id) {
+						EditText password = (EditText) view.findViewById(R.id.dialog_password);
+						socialWifi.getLocation();
+						ReportThread reportThread = new ReportThread(context, socialWifi, clickedWifi.get(ITEM_KEY), clickedWifi.get(BSSID_KEY), password.getText().toString(), clickedWifi.get(EXTRAS_KEY));
+						reportThread.execute();
+						dialog.dismiss();
+					}
+				})
+				.setNegativeButton(R.string.cancelUploadPassword, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.dismiss();
+					}
+				});
+		TextView ssid = (TextView) view.findViewById(R.id.dialog_ssid);
+		ssid.setText(clickedWifi.get(ITEM_KEY));
+		Dialog uploadDialog = builder.create();
+		uploadDialog.show();
 	}
 
 	private void connectWithPassword() {
