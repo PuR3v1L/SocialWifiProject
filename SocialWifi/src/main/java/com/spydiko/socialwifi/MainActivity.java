@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -213,21 +212,21 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 				Intent intent = new Intent(this, LoginActivity.class);
 				startActivityForResult(intent, 1);
 				break;
-			case R.id.setOnWifi:
-				if (socialWifi.getBoot()) {
-					item.setChecked(false);
-					socialWifi.setBoot(false);
-					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)
-						item.setIcon(android.R.drawable.button_onoff_indicator_off);
-					// if(AppSpecificOrientation.LOG) Log.d(TAG, "onBoot set to false");
-				} else {
-					item.setChecked(true);
-					socialWifi.setBoot(true);
-					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)
-						item.setIcon(android.R.drawable.button_onoff_indicator_on);
-					// if(AppSpecificOrientation.LOG) Log.d(TAG, "onBoot set to true");
-				}
-
+			//			case R.id.setOnWifi:
+			//				if (socialWifi.getBoot()) {
+			//					item.setChecked(false);
+			//					socialWifi.setBoot(false);
+			//					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)
+			//						item.setIcon(android.R.drawable.button_onoff_indicator_off);
+			//					// if(AppSpecificOrientation.LOG) Log.d(TAG, "onBoot set to false");
+			//				} else {
+			//					item.setChecked(true);
+			//					socialWifi.setBoot(true);
+			//					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)
+			//						item.setIcon(android.R.drawable.button_onoff_indicator_on);
+			//					// if(AppSpecificOrientation.LOG) Log.d(TAG, "onBoot set to true");
+			//				}
+			//
 
 		}
 		return true;
@@ -238,15 +237,15 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 
-		if (socialWifi.getBoot()) {
-			menu.findItem(R.id.setOnWifi).setChecked(true);
-			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)
-				menu.findItem(R.id.setOnWifi).setIcon(android.R.drawable.button_onoff_indicator_on);
-		} else {
-			menu.findItem(R.id.setOnWifi).setChecked(false);
-			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)
-				menu.findItem(R.id.setOnWifi).setIcon(android.R.drawable.button_onoff_indicator_off);
-		}
+		//		if (socialWifi.getBoot()) {
+		//			menu.findItem(R.id.setOnWifi).setChecked(true);
+		//			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)
+		//				menu.findItem(R.id.setOnWifi).setIcon(android.R.drawable.button_onoff_indicator_on);
+		//		} else {
+		//			menu.findItem(R.id.setOnWifi).setChecked(false);
+		//			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)
+		//				menu.findItem(R.id.setOnWifi).setIcon(android.R.drawable.button_onoff_indicator_off);
+		//		}
 		return true;
 	}
 

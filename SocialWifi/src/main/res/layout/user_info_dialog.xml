@@ -9,7 +9,7 @@
 
     <TextView
         android:id="@+id/dialog_username"
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="64dp"
         android:textSize="27sp"
         android:gravity="center"
@@ -18,19 +18,22 @@
         android:background="@drawable/upload_background"
         android:layout_marginBottom="4dp"/>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_height="match_parent"
-        android:layout_width="match_parent"
-        android:orientation="horizontal">
+        android:layout_width="wrap_content"
+        android:layout_gravity="center">
 
         <TextView
             android:text="@string/number_of_uploads"
+            android:id="@+id/static_number_of_uploads_string"
             android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
             android:layout_width="wrap_content"/>
 
         <TextView
             android:id="@+id/number_of_uploads_textview"
             android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/static_number_of_uploads_string"
             android:layout_width="wrap_content"/>
 
         <ProgressBar
@@ -39,8 +42,9 @@
             android:layout_height="wrap_content"
             android:id="@+id/number_of_uploads_progressbar"
             android:visibility="gone"
+            android:layout_toRightOf="@id/number_of_uploads_textview"
             android:layout_gravity="right"/>
-    </LinearLayout>
+    </RelativeLayout>
 
 
 </LinearLayout>

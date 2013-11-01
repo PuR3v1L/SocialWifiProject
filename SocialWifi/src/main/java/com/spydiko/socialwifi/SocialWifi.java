@@ -55,7 +55,7 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 	private float areaRadius;
 	private WifiManager wifiManager;
 	private ConnectivityManager connectivityManager;
-	private boolean boot;
+
 
 	public void onCreate() {
 		super.onCreate();
@@ -117,14 +117,14 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 	public void loadPreferences() {
 		Log.d(TAG, "loadPreferences");
 		areaRadius = prefs.getFloat("areaRadius", 3);
-		boot = prefs.getBoolean("boot", false);
+
 		numOfUploads = prefs.getString("num_of_uploads", "0");
 	}
 
 	public void savePreferences() {
 		Log.d(TAG, "savePreferences");
 		editor.putFloat("areaRadius", areaRadius);
-		editor.putBoolean("boot", boot);
+
 		editor.putString("num_of_uploads", numOfUploads);
 		editor.commit();
 	}
@@ -520,14 +520,6 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	public boolean getBoot() {
-		return boot;
-	}
-
-	public void setBoot(boolean boot) {
-		this.boot = boot;
 	}
 
 }
