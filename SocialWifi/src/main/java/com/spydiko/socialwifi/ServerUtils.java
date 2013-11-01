@@ -282,6 +282,7 @@ public class ServerUtils {
 			sk.close();
 			dos.close();
 			dis.close();
+			Log.d(TAG,"closing socket");
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
