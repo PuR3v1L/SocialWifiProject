@@ -24,6 +24,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -61,6 +62,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 		setContentView(R.layout.activity_main);
 		socialWifi = (SocialWifi) getApplication();
 		usernameTextView = (TextView) findViewById(R.id.usernameTextView);
+		usernameTextView.setOnClickListener(this);
 		swipe2Refresh = (TextView) findViewById(R.id.swipe2refresh);
 		if (!socialWifi.getSharedPreferenceBoolean("notFirstTime")) {
 			Intent intent = new Intent(this, LoginActivity.class);
@@ -259,11 +261,20 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 
 	@Override
 	public void onClick(View v) {
+
+
+		switch (v.getId()) {
+			case (R.id.usernameTextView):
+				showUserInfo();
+				return;
+
+		}
+
+
 		if (socialWifi.getWifiManager().isWifiEnabled() == false) {
 			Toast.makeText(getApplicationContext(), "wifi is disabled..making it enabled", Toast.LENGTH_LONG).show();
 			socialWifi.getWifiManager().setWifiEnabled(true);
 		}
-
 		switch (v.getId()) {
 			case (R.id.right):
 				clickedWifi = (HashMap<String, String>) simpleAdapter.getItem((Integer) v.getTag());
@@ -282,6 +293,35 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 			default:
 				break;
 		}
+	}
+
+	private void showUserInfo() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		LayoutInflater inflater = this.getLayoutInflater();
+		final View view = inflater.inflate(R.layout.user_info_dialog, null);
+		TextView usernameTextView = (TextView) view.findViewById(R.id.dialog_username);
+		usernameTextView.setText(socialWifi.getSharedPreferenceString("username"));
+		TextView numOfUploadsTextview = (TextView) view.findViewById(R.id.number_of_uploads_textview);
+		ProgressBar numOfUploadsProgressBar = (ProgressBar) view.findViewById(R.id.number_of_uploads_progressbar);
+		//		numOfUploadsProgressBar.setVisibility(View.VISIBLE);
+
+		builder.setView(view)
+				.setPositiveButton(R.string.logout, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int id) {
+						socialWifi.logout();
+						dialog.dismiss();
+						Intent intent = new Intent(context, LoginActivity.class);
+						startActivityForResult(intent, 1);
+					}
+				});
+
+		Dialog uploadDialog = builder.create();
+
+		uploadDialog.show();
+		UserInfoThread userInfoThread = new UserInfoThread(context, socialWifi, view);
+		userInfoThread.execute();
+
 	}
 
 	private void reportNewPassword() {

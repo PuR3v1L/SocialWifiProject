@@ -18,10 +18,10 @@ import java.net.SocketException;
  */
 public class ServerUtils {
 
+	public static final int CORRECT_REPORT = 0, CORRECT_UPDATE = 1, CORRECT_ADD = 2, CORRECT_USERINFO = 3;
+	public static final int WRONG_USER = 4;
+	public static final int WRONG_REPORT = 5, WRONG_UPDATE = 6, WRONG_ADD = 7, WRONG_USERINFO = 8;
 	private static final String TAG = "ServerUtils";
-	public static final int CORRECT_REPORT = 0, CORRECT_UPDATE = 0, CORRECT_ADD = 0;
-	public static final int WRONG_USER = 1;
-	public static final int WRONG_REPORT = 2, WRONG_UPDATE = 2, WRONG_ADD = 3;
 	private DataInputStream dis;
 	private DataOutputStream dos;
 	private String ssid;
@@ -31,6 +31,7 @@ public class ServerUtils {
 	private String extraInfo;
 	private String username;
 	private String hostIPstr;
+	private String numOfUploads;
 	private int serverPort;
 	private byte[] buffer;
 	private byte[] pyBuffer;
@@ -254,6 +255,25 @@ public class ServerUtils {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return WRONG_ADD;
+		}
+	}
+
+	public int tryToGetUserInfo(SocialWifi socialWifi) {
+		try {
+
+			dos.writeBytes("userInfo" + "\r\n");
+			dos.writeBytes(username + "\r\n");
+			numOfUploads = dis.readLine();
+			if (numOfUploads.contains("notUser")) return WRONG_USER;
+			socialWifi.setNumOfUploads(numOfUploads);
+			Log.d(TAG, "numOfUploads: " + numOfUploads);
+			return CORRECT_USERINFO;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return WRONG_USERINFO;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return WRONG_USERINFO;
 		}
 	}
 

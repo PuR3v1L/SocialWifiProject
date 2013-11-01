@@ -2,7 +2,6 @@ package com.spydiko.socialwifi;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.widget.Toast;
 
 /**
  * Created by jim on 1/11/2013.

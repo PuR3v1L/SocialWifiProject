@@ -24,6 +24,7 @@
     <string name="searching">Searching...</string>
     <string name="release">Release</string>
     <string name="setOnWifi">Enable on WiFi</string>
+    <string name="number_of_uploads">Number of uploads:</string>
 
 
 </resources>

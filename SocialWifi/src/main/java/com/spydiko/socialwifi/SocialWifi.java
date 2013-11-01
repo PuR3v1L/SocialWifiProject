@@ -42,6 +42,7 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 	private static final long MINIMUM_TIME_BETWEEN_UPDATES = 1000; // in Milliseconds
 	private SharedPreferences prefs;
 	public SharedPreferences.Editor editor;
+	private String numOfUploads;
 	//	private FileOutputStream outputStream;
 	private OutputStreamWriter osw;
 	private ArrayList<WifiPass> wifies, pyWifies;
@@ -110,13 +111,15 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 	public void loadPreferences() {
 		Log.d(TAG, "loadPreferences");
 		areaRadius = prefs.getFloat("areaRadius", 3);
-		boot = prefs.getBoolean("boot",false);
+		boot = prefs.getBoolean("boot", false);
+		numOfUploads = prefs.getString("num_of_uploads", "0");
 	}
 
 	public void savePreferences() {
 		Log.d(TAG, "savePreferences");
 		editor.putFloat("areaRadius", areaRadius);
-		editor.putBoolean("boot",boot);
+		editor.putBoolean("boot", boot);
+		editor.putString("num_of_uploads", numOfUploads);
 		editor.commit();
 	}
 
@@ -457,6 +460,14 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 
 	public void setConnectivityManager(ConnectivityManager connectivityManager) {
 		this.connectivityManager = connectivityManager;
+	}
+
+	public String getNumOfUploads() {
+		return numOfUploads;
+	}
+
+	public void setNumOfUploads(String numOfUploads) {
+		this.numOfUploads = numOfUploads;
 	}
 
 	private class MyLocationListener implements LocationListener {
