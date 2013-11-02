@@ -58,6 +58,11 @@ public class UploadPasswordThread extends AsyncTask<Void, Void, Integer> {
 		if (!correctUser) return ServerUtils.WRONG_USER;
 		if (!serverUtils.tryToConnect(socialWifi.getWifiManager(), socialWifi.getConnectivityManager())) return FAILED_TO_CONNECT;
 		if (!serverUtils.tryToLocalize(socialWifi)) return FAILED_TO_LOCALIZE;
+		try {
+			Thread.sleep(4000);
+		} catch (Exception e){
+			e.printStackTrace();
+		}
 		if (!serverUtils.tryToOpenSocket()) return FAILED_TO_OPEN_SOCKET;
 		location = socialWifi.getLocationCoord();
 		return serverUtils.tryToAdd(location);
