@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -54,6 +55,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 	private CheckBox showPasswordCB;
 	private PullToRefreshAttacher mPullToRefreshAttacher;
 	private FileOutputStream outputStreamPy;
+	private boolean priorThatICS;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -134,12 +136,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 							lv.setAdapter(simpleAdapter);
 							lv.setVisibility(View.VISIBLE);
 							simpleAdapter.notifyDataSetChanged();
-							mPullToRefreshAttacher.setRefreshComplete();
+							if (!priorThatICS) mPullToRefreshAttacher.setRefreshComplete();
 						}
 					}
 				};
 
-		// Create a PullToRefreshAttacher instance
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+			priorThatICS = false;
+			// Create a PullToRefreshAttacher instance
 		mPullToRefreshAttacher = PullToRefreshAttacher.get(this);
 
 		// Retrieve the PullToRefreshLayout from the content view
@@ -147,6 +151,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 
 		// Give the PullToRefreshAttacher to the PullToRefreshLayout, along with a refresh listener.
 		ptrLayout.setPullToRefreshAttacher(mPullToRefreshAttacher, this);
+		} else {
+			priorThatICS = true;
+		}
 
 	}
 
@@ -212,6 +219,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 				Intent intent = new Intent(this, LoginActivity.class);
 				startActivityForResult(intent, 1);
 				break;
+			case R.id.scan_for_wifi:
+				socialWifi.getWifiManager().startScan();
+				break;
 			//			case R.id.setOnWifi:
 			//				if (socialWifi.getBoot()) {
 			//					item.setChecked(false);
@@ -236,6 +246,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
+		if (priorThatICS) menu.findItem(R.id.scan_for_wifi).setVisible(true);
+
 
 		//		if (socialWifi.getBoot()) {
 		//			menu.findItem(R.id.setOnWifi).setChecked(true);

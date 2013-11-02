@@ -2,7 +2,13 @@
     <item
         android:id="@+id/itemToggleService"
         android:title="@string/updateFromServer"
+        android:icon="@android:drawable/stat_sys_download"
+        android:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/scan_for_wifi"
+        android:title="@string/click_to_refresh"
         android:icon="@android:drawable/stat_notify_sync"
+        android:visible="false"
         android:showAsAction="ifRoom"/>
     <item
         android:id="@+id/preferences"
