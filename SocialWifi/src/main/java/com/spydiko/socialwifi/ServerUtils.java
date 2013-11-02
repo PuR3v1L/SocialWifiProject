@@ -148,7 +148,7 @@ public class ServerUtils {
 		boolean ok = false;
 		Log.d(TAG, "entered");
 		while (System.currentTimeMillis() - current < 10000) {
-			networkInfo = connectivityManager.getActiveNetworkInfo();
+			networkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 			try {
 				if (networkInfo != null && networkInfo.isConnected() && wifiManager.getConnectionInfo().getBSSID().equals(bssid)) {
 					ok = true;
