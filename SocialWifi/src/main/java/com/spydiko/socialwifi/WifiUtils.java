@@ -16,13 +16,12 @@ import java.util.List;
  */
 public class WifiUtils {
 
-	private static final String TAG = "WifiUtils";
 	public static final int SECURITY_NONE = 0;
 	public static final int SECURITY_WEP = 1;
 	public static final int SECURITY_PSK = 2;
 	public static final int SECURITY_EAP = 3;
+	private static final String TAG = "WifiUtils";
 	private static String ITEM_KEY = "key", BSSID_KEY = "bssid", EXISTS_KEY = "exist", EXTRAS_KEY = "extra", IMAGE_KEY = "image", SIGNAL_KEY = "signal", ENTERPRISE_CONFIG_KEY = "enterprise";
-
 
 	/**
 	 * Create a configuration file for the specifies WiFi.
@@ -118,7 +117,6 @@ public class WifiUtils {
 		return wifiConfiguration;
 
 	}
-
 
 	/**
 	 * Try to connect to the specifies network.
@@ -234,12 +232,14 @@ public class WifiUtils {
 
 	public static void removeNetwork(String ssid, WifiManager wifiManager) {
 		List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
+		if (list == null) return;
 		for (WifiConfiguration i : list) {
 			Log.d(TAG, i.SSID + " " + i.BSSID);
 			if (i.SSID != null && i.SSID.equals("\"" + ssid + "\"")) {
 				wifiManager.removeNetwork(i.networkId);
 			}
 		}
+
 	}
 
 
