@@ -40,22 +40,22 @@ public class UpdateThread extends AsyncTask<Void, Integer, Integer> {
 		downloadBar.setProgress(value[0]);
 		switch (value[0]) {
 			case 0:
-				downloadDialogText.setText("Getting Location");
+				downloadDialogText.setText(socialWifi.getMyResources().getString(R.string.retrieve_location));
 				break;
 			case 10:
-				downloadDialogText.setText("Getting Location");
+				downloadDialogText.setText(socialWifi.getMyResources().getString(R.string.retrieve_location));
 				break;
 			case 33:
-				downloadDialogText.setText("Opening Socket");
+				downloadDialogText.setText(socialWifi.getMyResources().getString(R.string.estblish_connection));
 				break;
 			case 80:
-				downloadDialogText.setText("Downloading");
+				downloadDialogText.setText(socialWifi.getMyResources().getString(R.string.downloading));
 				break;
 			case 90:
-				downloadDialogText.setText("Updating local files");
+				downloadDialogText.setText(socialWifi.getMyResources().getString(R.string.update_local_files));
 				break;
 			case 100:
-				downloadDialogText.setText("Done!");
+				downloadDialogText.setText(socialWifi.getMyResources().getString(R.string.done));
 				break;
 		}
 	}

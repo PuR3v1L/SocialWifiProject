@@ -9,7 +9,7 @@
     <string name="updateFromServer">Update From Server</string>
     <string name="uploadPassword">Upload</string>
     <string name="cancelUploadPassword">Cancel</string>
-    <string name="password">Enter password...</string>
+    <string name="password">Enter password…</string>
     <string name="preferences">Preferences</string>
     <string name="localization_prefs">Localization Preferences</string>
     <string name="radius_pref_title">Area of interest</string>
@@ -21,11 +21,16 @@
     <string name="map_pref">Show Map</string>
     <string name="swipe_down_to_refresh">Swipe down to scan\nfor Wifi networks</string>
     <string name="pull2refresh">Pull to refresh</string>
-    <string name="searching">Searching...</string>
+    <string name="searching">Searching…</string>
     <string name="release">Release</string>
     <string name="setOnWifi">Enable on WiFi</string>
     <string name="number_of_uploads">Number of uploads:</string>
     <string name="click_to_refresh">Refresh</string>
+    <string name="retrieve_location">Retrieving Location</string>
+    <string name="estblish_connection">Connecting</string>
+    <string name="downloading">Downloading</string>
+    <string name="update_local_files">Updating local files</string>
+    <string name="done">Done!</string>
 
 
 </resources>

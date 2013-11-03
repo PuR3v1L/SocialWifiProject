@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.spydiko.socialwifi"
-          android:versionCode="2"
-          android:versionName="Alpha 0.1.0">
+          android:versionCode="3"
+          android:versionName="Alpha 0.1.1">
 
 
     <uses-sdk
@@ -75,9 +75,9 @@
 
 
         <!-- Spirosbond debug -->
-        <meta-data
-            android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyARTMH6sKhCLO5dCEez7pRtOttP-2q9w2Y"/>
+        <!--<meta-data-->
+        <!--android:name="com.google.android.maps.v2.API_KEY"-->
+        <!--android:value="AIzaSyARTMH6sKhCLO5dCEez7pRtOttP-2q9w2Y"/>-->
 
         <!--Purevil-->
         <!--<meta-data-->
@@ -85,9 +85,9 @@
         <!--android:value="AIzaSyAkqSSMZk8BYwopiOaTQ420lqZ3hNWO6Fg"/>-->
 
         <!--Spy.Di.Ko key-->
-        <!--<meta-data-->
-        <!--android:name="com.google.android.maps.v2.API_KEY"-->
-        <!--android:value="AIzaSyCmM5ULYdrvM_bCn-pJ0Vbe8jLe4debi0k"/>-->
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyCmM5ULYdrvM_bCn-pJ0Vbe8jLe4debi0k"/>
     </application>
 
 </manifest>

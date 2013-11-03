@@ -3,6 +3,7 @@ package com.spydiko.socialwifi;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -520,6 +521,10 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public Resources getMyResources() {
+		return getResources();
 	}
 
 }
