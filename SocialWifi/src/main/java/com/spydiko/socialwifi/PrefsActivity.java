@@ -36,7 +36,7 @@ public class PrefsActivity extends PreferenceActivity implements SharedPreferenc
 
 	private void setAreaRadiusListSum() {
 		areaRadiusList = (ListPreference) findPreference("area_radius_list");
-		areaRadiusList.setSummary(getResources().getString(R.string.area_radius_sum) + " " + socialWifi.getAreaRadius() + " km");
+		areaRadiusList.setSummary(getResources().getString(R.string.area_radius_sum) + " " + areaRadiusList.getValue() + " km");
 	}
 
 	@Override

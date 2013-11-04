@@ -106,6 +106,12 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 					list_value.setBackgroundResource(R.drawable.mybutton);
 					list_value.setOnClickListener(MainActivity.this);
 					right.setImageResource(android.R.drawable.ic_dialog_alert);
+					//					if (arrayList.get(position).get(EXTRAS_KEY).equals(String.valueOf(WifiUtils.SECURITY_NONE))) {
+					//						right.setBackgroundResource(android.R.color.transparent);
+					//						right.setOnClickListener(null);
+					//					} else {
+					//						right.setActivated(true);
+					//					}
 				} else {
 					list_value.setTextColor(Color.parseColor("#FFFFFF"));
 					list_value.setBackgroundResource(android.R.color.transparent);
@@ -144,13 +150,13 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
 			priorThatICS = false;
 			// Create a PullToRefreshAttacher instance
-		mPullToRefreshAttacher = PullToRefreshAttacher.get(this);
+			mPullToRefreshAttacher = PullToRefreshAttacher.get(this);
 
-		// Retrieve the PullToRefreshLayout from the content view
-		PullToRefreshLayout ptrLayout = (PullToRefreshLayout) findViewById(R.id.ptr_layout);
+			// Retrieve the PullToRefreshLayout from the content view
+			PullToRefreshLayout ptrLayout = (PullToRefreshLayout) findViewById(R.id.ptr_layout);
 
-		// Give the PullToRefreshAttacher to the PullToRefreshLayout, along with a refresh listener.
-		ptrLayout.setPullToRefreshAttacher(mPullToRefreshAttacher, this);
+			// Give the PullToRefreshAttacher to the PullToRefreshLayout, along with a refresh listener.
+			ptrLayout.setPullToRefreshAttacher(mPullToRefreshAttacher, this);
 		} else {
 			priorThatICS = true;
 		}
@@ -294,7 +300,24 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 					reportNewPassword();
 				} else {
 					Toast.makeText(this, "Upload button clicked...\n" + clickedWifi.get(ITEM_KEY), Toast.LENGTH_SHORT).show();
-					uploadPassword();
+					Log.d(TAG, "clickedWifi.get(EXTRAS_KEY): " + clickedWifi.get(EXTRAS_KEY));
+					if (clickedWifi.get(EXTRAS_KEY).equals(String.valueOf(WifiUtils.SECURITY_NONE))) {
+						//						connectWithPassword();
+						//						double[] location = socialWifi.getLocationCoord();
+						//						ArrayList<WifiPass> tmp = socialWifi.getWifies();
+						//						ArrayList<Double> loc = new ArrayList<Double>();
+						//						loc.add(0, location[0]);
+						//						loc.add(1, location[1]);
+						//						tmp.add(new WifiPass(ssid, bssid, password, loc));
+						//						socialWifi.setWifies(tmp);
+						//						socialWifi.getWifiManager().startScan();
+						socialWifi.getLocation();
+						UploadOpenThread uploadOpenThread = new UploadOpenThread(context, socialWifi, clickedWifi.get(ITEM_KEY), clickedWifi.get(BSSID_KEY), "", clickedWifi.get(EXTRAS_KEY));
+						uploadOpenThread.execute();
+
+					} else {
+						uploadPassword();
+					}
 				}
 				break;
 			case (R.id.list_value):
@@ -382,6 +405,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 			if (wifiPass.getSsid().equals(ssid)) {
 				if (wifiPass.getBssid().equals(bssid)) {
 					password = wifiPass.getPassword();
+					if (password.equals("<empty>"))
+						password = "";
+					break;
 				}
 			}
 		}

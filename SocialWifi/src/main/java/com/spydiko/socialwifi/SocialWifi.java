@@ -215,15 +215,18 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 					check = 3;
 				} else if (check == 3 && name.equals("stringstart")) {
 					ssid = xpp.getText();
-					//                    Log.d(TAG, "ssid: " + ssid);
+					Log.d(TAG, "ssid: " + ssid);
 					check = 4;
 				} else if (check == 4 && name.equals("stringstart")) {
 					bssid = xpp.getText();
 					//                    Log.d(TAG, "bssid: " + bssid);
 					check = 5;
 				} else if (check == 5 && name.equals("stringstart")) {
+					Log.d(TAG, "mpika password xml");
 					password = xpp.getText();
-					//                    Log.d(TAG, "pass: " + password);
+					//					if(password.equals("<empty>"))
+					//						password="";
+					Log.d(TAG, ssid + " pass: " + password);
 					check = -1;
 				}
 			} else if (eventType == XmlPullParser.END_TAG) {

@@ -176,14 +176,36 @@ public class WifiUtils {
 				item.put(ITEM_KEY, results.get(size).SSID);
 				Log.d(TAG, "level (db) of " + results.get(size).SSID + " :" + results.get(size).level);
 				item.put(SIGNAL_KEY, Integer.toString(results.get(size).level));
-				if (results.get(size).level > -60)
-					item.put(IMAGE_KEY, Integer.toString(R.drawable.wifi_full));
-				else if (results.get(size).level > -80)
-					item.put(IMAGE_KEY, Integer.toString(R.drawable.wifi_good));
-				else if (results.get(size).level > -90)
-					item.put(IMAGE_KEY, Integer.toString(R.drawable.wifi_weak));
-				else
-					item.put(IMAGE_KEY, Integer.toString(R.drawable.wifi_no_signal));
+				if (results.get(size).level > -60) {
+					if (getSecurity(results.get(size)) == SECURITY_NONE) {
+						Log.d(TAG, "Security NONE");
+						item.put(IMAGE_KEY, Integer.toString(R.drawable.wifi_full));
+					} else {
+						item.put(IMAGE_KEY, Integer.toString(R.drawable.wifi_full_lock));
+					}
+				} else if (results.get(size).level > -80) {
+					if (getSecurity(results.get(size)) == SECURITY_NONE) {
+						Log.d(TAG, "Security NONE");
+						item.put(IMAGE_KEY, Integer.toString(R.drawable.wifi_good));
+					} else {
+						item.put(IMAGE_KEY, Integer.toString(R.drawable.wifi_good_lock));
+					}
+				} else if (results.get(size).level > -90) {
+					if (getSecurity(results.get(size)) == SECURITY_NONE) {
+						Log.d(TAG, "Security NONE");
+						item.put(IMAGE_KEY, Integer.toString(R.drawable.wifi_weak));
+					} else {
+						item.put(IMAGE_KEY, Integer.toString(R.drawable.wifi_weak_lock));
+					}
+				} else {
+					if (getSecurity(results.get(size)) == SECURITY_NONE) {
+						Log.d(TAG, "Security NONE");
+						item.put(IMAGE_KEY, Integer.toString(R.drawable.wifi_no_signal));
+					} else {
+						item.put(IMAGE_KEY, Integer.toString(R.drawable.wifi_no_signal_lock));
+					}
+				}
+				Log.d(TAG, "Security: " + String.valueOf(WifiUtils.getSecurity(results.get(size))));
 				item.put(EXTRAS_KEY, String.valueOf(WifiUtils.getSecurity(results.get(size))));
 				item.put(BSSID_KEY, results.get(size).BSSID);
 				item.put(EXISTS_KEY, "n");
