@@ -210,7 +210,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.itemToggleService: // Refresh from server
-				socialWifi.getLocation();
+				//				socialWifi.getLocation();
 				UpdateThread updateThread = new UpdateThread(this, socialWifi);
 				updateThread.execute();
 				break;
@@ -311,7 +311,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 						//						tmp.add(new WifiPass(ssid, bssid, password, loc));
 						//						socialWifi.setWifies(tmp);
 						//						socialWifi.getWifiManager().startScan();
-						socialWifi.getLocation();
+						//						socialWifi.getLocation();
 						UploadOpenThread uploadOpenThread = new UploadOpenThread(context, socialWifi, clickedWifi.get(ITEM_KEY), clickedWifi.get(BSSID_KEY), "", clickedWifi.get(EXTRAS_KEY));
 						uploadOpenThread.execute();
 
@@ -379,7 +379,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 					@Override
 					public void onClick(DialogInterface dialog, int id) {
 						EditText password = (EditText) view.findViewById(R.id.dialog_password);
-						socialWifi.getLocation();
+						//						socialWifi.getLocation();
 						ReportThread reportThread = new ReportThread(context, socialWifi, clickedWifi.get(ITEM_KEY), clickedWifi.get(BSSID_KEY), password.getText().toString(), clickedWifi.get(EXTRAS_KEY));
 						reportThread.execute();
 						dialog.dismiss();
@@ -436,7 +436,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Pull
 					@Override
 					public void onClick(DialogInterface dialog, int id) {
 						EditText password = (EditText) view.findViewById(R.id.dialog_password);
-						socialWifi.getLocation();
+						//						socialWifi.getLocation();
 						UploadPasswordThread uploadPasswordThread = new UploadPasswordThread(context, socialWifi, clickedWifi.get(ITEM_KEY), clickedWifi.get(BSSID_KEY), password.getText().toString(), clickedWifi.get(EXTRAS_KEY));
 						uploadPasswordThread.execute();
 						dialog.dismiss();

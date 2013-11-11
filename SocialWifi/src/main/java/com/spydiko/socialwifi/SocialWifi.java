@@ -56,6 +56,7 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 	private float areaRadius;
 	private WifiManager wifiManager;
 	private ConnectivityManager connectivityManager;
+	private LocationUtils locationUtils;
 
 
 	public void onCreate() {
@@ -69,12 +70,13 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 		prefs.registerOnSharedPreferenceChangeListener(this);
 		editor = prefs.edit();
 		loadPreferences();
-		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		//		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		locationUtils = new LocationUtils(this);
 	}
 
-	public double[] getLocationCoord() {
-		return location_now;
-	}
+	//	public double[] getLocationCoord() {
+	//		return location_now;
+	//	}
 
 	public static void createXMLString(OutputStreamWriter out, ArrayList<WifiPass> wifies) throws IllegalArgumentException, IllegalStateException, IOException {
 		XmlSerializer xmlSerializer = Xml.newSerializer();
@@ -374,21 +376,21 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 		return userData;
 	}
 
-	public void getLocation() {
-		gotLocation = false;
-		Log.d(TAG, "getLocation");
-		  /*
-		 * Loop over the array backwards, and if you get an accurate location,
-     * then break out the loop
-     */
-		lm.requestLocationUpdates(
-				LocationManager.NETWORK_PROVIDER,
-				MINIMUM_TIME_BETWEEN_UPDATES,
-				MINIMUM_DISTANCE_CHANGE_FOR_UPDATES,
-				new MyLocationListener()
-		);
-
-	}
+	//	public void getLocation() {
+	//		gotLocation = false;
+	//		Log.d(TAG, "getLocation");
+	//		  /*
+	//		 * Loop over the array backwards, and if you get an accurate location,
+	//     * then break out the loop
+	//     */
+	//		lm.requestLocationUpdates(
+	//				LocationManager.NETWORK_PROVIDER,
+	//				MINIMUM_TIME_BETWEEN_UPDATES,
+	//				MINIMUM_DISTANCE_CHANGE_FOR_UPDATES,
+	//				new MyLocationListener()
+	//		);
+	//
+	//	}
 
 	public float getAreaRadius() {
 		return areaRadius;
@@ -400,13 +402,13 @@ public class SocialWifi extends Application implements SharedPreferences.OnShare
 		//		editor.putFloat("areaRadius", areaRadius);
 	}
 
-	public boolean isGotLocation() {
-		return gotLocation;
-	}
+	//	public boolean isGotLocation() {
+	//		return gotLocation;
+	//	}
 
-	public void setGotLocation(boolean gotLocation) {
-		this.gotLocation = gotLocation;
-	}
+	//	public void setGotLocation(boolean gotLocation) {
+	//		this.gotLocation = gotLocation;
+	//	}
 
 	public ArrayList<WifiPass> getWifies() {
 		return wifies;

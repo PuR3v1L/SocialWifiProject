@@ -1,5 +1,6 @@
 package com.spydiko.socialwifi;
 
+import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
@@ -116,10 +117,10 @@ public class ServerUtils {
 
 	}
 
-	public boolean tryToLocalize(SocialWifi socialWifi) {
+	/*public boolean tryToLocalize(SocialWifi socialWifi) {
 
 		long current = System.currentTimeMillis();
-		             /* Get current location through wifi*/
+		             *//* Get current location through wifi*//*
 		while (!socialWifi.isGotLocation() && System.currentTimeMillis() - current < 10000) {
 			try {
 				Thread.sleep(300);
@@ -132,7 +133,7 @@ public class ServerUtils {
 		}
 		return true;
 
-	}
+	}*/
 
 	public boolean tryToConnect(WifiManager wifiManager, ConnectivityManager connectivityManager) {
 		int typeOfEncryption = 0;
@@ -188,14 +189,14 @@ public class ServerUtils {
 
 	}
 
-	public int tryToUpdate(float areaRadius, double[] location) {
+	public int tryToUpdate(float areaRadius, Location location) {
 		try {
 			dos.writeBytes("update" + "\r\n");
 			dos.writeBytes(String.valueOf(areaRadius) + "\r\n");
-			dos.writeBytes(Double.toString(location[0]) + "\r\n");
-			dos.writeBytes(Double.toString(location[1]) + "\r\n");
+			dos.writeBytes(Double.toString(location.getLatitude()) + "\r\n");
+			dos.writeBytes(Double.toString(location.getLongitude()) + "\r\n");
 			dos.writeBytes(username + "\r\n");
-			Log.d(TAG, "Sent: " + String.valueOf(areaRadius) + " " + Double.toString(location[0]) + " " + Double.toString(location[1]) + " " + username);
+			Log.d(TAG, "Sent: " + String.valueOf(areaRadius) + " " + Double.toString(location.getLatitude()) + " " + Double.toString(location.getLongitude()) + " " + username);
 			String inputMsg = dis.readLine();
 			Log.d(TAG, "inputMsg: " + inputMsg);
 			try {
@@ -230,13 +231,13 @@ public class ServerUtils {
 		}
 	}
 
-	public int tryToAdd(double[] location) {
+	public int tryToAdd(Location location) {
 		try {
 			dos.writeBytes("addPass" + "\r\n");
-			Log.d(TAG, Double.toString(location[0]));
-			Log.d(TAG, Double.toString(location[1]));
-			dos.writeBytes(Double.toString(location[0]) + "\r\n");
-			dos.writeBytes(Double.toString(location[1]) + "\r\n");
+			Log.d(TAG, Double.toString(location.getLatitude()));
+			Log.d(TAG, Double.toString(location.getLongitude()));
+			dos.writeBytes(Double.toString(location.getLatitude()) + "\r\n");
+			dos.writeBytes(Double.toString(location.getLongitude()) + "\r\n");
 			Log.d(TAG, ssid);
 			dos.writeBytes(ssid + "\r\n");
 			Log.d(TAG, bssid);

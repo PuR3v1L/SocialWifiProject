@@ -2,6 +2,7 @@ package com.spydiko.socialwifi;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.view.Window;
 import android.widget.Toast;
@@ -21,7 +22,7 @@ public class UploadPasswordThread extends AsyncTask<Void, Void, Integer> {
 	private Dialog loadingDialog;
 	private SocialWifi socialWifi;
 	private ServerUtils serverUtils;
-	private double[] location;
+	private Location location;
 	private final static int FAILED_TO_LOCALIZE = -1;
 	private final static int FAILED_TO_OPEN_SOCKET = -2;
 	private final static int FAILED_TO_ADD = -3;
@@ -38,6 +39,7 @@ public class UploadPasswordThread extends AsyncTask<Void, Void, Integer> {
 		this.bssid = bssid;
 		this.password = password;
 		this.extraInfo = extraInfo;
+		this.location = LocationUtils.getCurrentLocation();
 	}
 
 	@Override
@@ -57,14 +59,14 @@ public class UploadPasswordThread extends AsyncTask<Void, Void, Integer> {
 	protected Integer doInBackground(Void... params) {
 		if (!correctUser) return ServerUtils.WRONG_USER;
 		if (!serverUtils.tryToConnect(socialWifi.getWifiManager(), socialWifi.getConnectivityManager())) return FAILED_TO_CONNECT;
-		if (!serverUtils.tryToLocalize(socialWifi)) return FAILED_TO_LOCALIZE;
-		try {
-			Thread.sleep(4000);
-		} catch (Exception e){
-			e.printStackTrace();
-		}
+		if (location == null) return FAILED_TO_LOCALIZE;
+		//		try {
+		//			Thread.sleep(4000);
+		//		} catch (Exception e){
+		//			e.printStackTrace();
+		//		}
 		if (!serverUtils.tryToOpenSocket()) return FAILED_TO_OPEN_SOCKET;
-		location = socialWifi.getLocationCoord();
+		//		location = socialWifi.getLocationCoord();
 		return serverUtils.tryToAdd(location);
 	}
 
@@ -94,8 +96,8 @@ public class UploadPasswordThread extends AsyncTask<Void, Void, Integer> {
 			Toast.makeText(context, "Success!\nNew password stored!", Toast.LENGTH_SHORT).show();
 			ArrayList<WifiPass> tmp = socialWifi.getWifies();
 			ArrayList<Double> loc = new ArrayList<Double>();
-			loc.add(0, location[0]);
-			loc.add(1, location[1]);
+			loc.add(0, location.getLatitude());
+			loc.add(1, location.getLongitude());
 			tmp.add(new WifiPass(ssid, bssid, password, loc));
 			socialWifi.setWifies(tmp);
 			socialWifi.getWifiManager().startScan();

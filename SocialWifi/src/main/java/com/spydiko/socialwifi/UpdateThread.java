@@ -2,6 +2,7 @@ package com.spydiko.socialwifi;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.view.Window;
 import android.widget.ProgressBar;
@@ -27,11 +28,13 @@ public class UpdateThread extends AsyncTask<Void, Integer, Integer> {
 	private boolean correctUser;
 	private TextView downloadDialogText;
 	private ProgressBar downloadBar;
+	private Location location;
 
 
 	public UpdateThread(Context context, SocialWifi socialWifi) {
 		this.context = context;
 		this.socialWifi = socialWifi;
+		this.location = LocationUtils.getCurrentLocation();
 	}
 
 	@Override
@@ -80,13 +83,13 @@ public class UpdateThread extends AsyncTask<Void, Integer, Integer> {
 	protected Integer doInBackground(Void... params) {
 		if (!correctUser) return ServerUtils.WRONG_USER;
 		publishProgress(10);
-		if (!serverUtils.tryToLocalize(socialWifi)) return FAILED_TO_LOCALIZE;
-
+		//		if (!serverUtils.tryToLocalize(socialWifi)) return FAILED_TO_LOCALIZE;
+		if (location == null) return FAILED_TO_LOCALIZE;
 		publishProgress(33);
 		if (!serverUtils.tryToOpenSocket()) return FAILED_TO_OPEN_SOCKET;
 
 		publishProgress(80);
-		return serverUtils.tryToUpdate(socialWifi.getAreaRadius(), socialWifi.getLocationCoord());
+		return serverUtils.tryToUpdate(socialWifi.getAreaRadius(), location);
 	}
 
 	@Override
